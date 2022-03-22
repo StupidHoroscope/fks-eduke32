@@ -815,6 +815,7 @@ void getvalidmodes(void)
     } \
 }
 
+    ADDMODE(320, 240, 8, 0);
     ADDMODE(320, 240, 32, 0);
 
     qsort((void*)validmode, validmodecnt, sizeof(struct validmode_t), (int32_t(*)(const void*,const void*))sortmodes);
@@ -840,11 +841,15 @@ int32_t checkvideomode(int32_t *x, int32_t *y, int32_t c, int32_t fs, int32_t fo
 
     // fix up the passed resolution values to be multiples of 8
     // and at least 320x200 or at most MAXXDIMxMAXYDIM
+#ifdef FUNKEYS
+	
+#else
     if (*x < 320) *x = 320;
     if (*y < 200) *y = 200;
     if (*x > MAXXDIM) *x = MAXXDIM;
     if (*y > MAXYDIM) *y = MAXYDIM;
 //    *x &= 0xfffffff8l;
+#endif
 
     for (i=0; i<validmodecnt; i++)
     {
@@ -901,7 +906,7 @@ int32_t setvideomode(int32_t x, int32_t y, int32_t c, int32_t fs)
         return 0;
     }
 
-    if (checkvideomode(&x,&y,c,fs,0) < 0) return -1;
+	//if (checkvideomode(&x, &y, c, fs, 0) < 0) return -1;
 
     startwin_close();
 
@@ -923,7 +928,7 @@ int32_t setvideomode(int32_t x, int32_t y, int32_t c, int32_t fs)
     {
         initprintf("Setting video mode %dx%d (%d-bpp %s)\n",
                    x,y,c, ((fs&1) ? "fullscreen" : "windowed"));
-        sdl_surface = SDL_SetVideoMode(x, y, c, SDL_HWSURFACE | SDL_DOUBLEBUF);
+        sdl_surface = SDL_SetVideoMode(x, y, c, SDL_HWSURFACE | SDL_DOUBLEBUF | SDL_FULLSCREEN);
         if (!sdl_surface)
         {
             initprintf("Unable to set video mode!\n");
