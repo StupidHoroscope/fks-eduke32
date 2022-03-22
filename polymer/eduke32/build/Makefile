@@ -113,7 +113,7 @@ ARCH=-fstrength-reduce -fthread-jumps -fexpensive-optimizations -fomit-frame-poi
 #AR=ar
 #RANLIB=ranlib
 
-OURCFLAGS=$(debug) -W -Wall -Wimplicit \
+OURCFLAGS=$(debug) -W -Wall -Wimplicit -w \
 	-Wno-char-subscripts -funsigned-char -fno-strict-aliasing -DNO_GCC_BUILTINS \
 	-DKSFORBUILD -I$(INC) -I$(SDL_INC) -D_FORTIFY_SOURCE=2 \
     $(F_JUMP_TABLES) $(ARCH)

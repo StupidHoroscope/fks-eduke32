@@ -23,7 +23,7 @@ ifneq (0,$(DEBUGANYWAY))
   debug+=-ggdb
 endif
 
-CFLAGS=$(debug) -W -Wall -Wimplicit -Werror-implicit-function-declaration \
+CFLAGS=$(debug) -W -Wall -Wimplicit -Werror-implicit-function-declaration -w \
     -funsigned-char -fno-strict-aliasing -DNO_GCC_BUILTINS -D_FORTIFY_SOURCE=2 \
     $(F_JUMP_TABLES) $(F_NO_STACK_PROTECTOR)
 

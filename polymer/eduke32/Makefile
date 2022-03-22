@@ -89,7 +89,7 @@ ARCH=-fstrength-reduce -fthread-jumps -fexpensive-optimizations -fomit-frame-poi
 SDLCONFIG=/opt/FunKey-sdk-2.3.0/arm-funkey-linux-musleabihf/sysroot/usr/bin/
 SDL_FRAMEWORK=/opt/FunKey-sdk-2.3.0/arm-funkey-linux-musleabihf/sysroot/usr/include/
 
-OURCFLAGS=$(debug) -W -Wall -Wimplicit \
+OURCFLAGS=$(debug) -W -Wall -Wimplicit -w \
     -funsigned-char -fno-strict-aliasing -DNO_GCC_BUILTINS -DFUNKEYS \
     -I$(INC) -I$(EINC) -I$(SRC)/jmact -I$(JAUDIOLIBDIR)/include -I$(ENETDIR)/include -D_FORTIFY_SOURCE=2 \
     $(F_JUMP_TABLES) $(ARCH)
