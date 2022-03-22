@@ -3,6 +3,11 @@
 make veryclean
 make
 
+if  [[ ! -f eduke32 ]] ; then
+    echo 'Build failed!'
+    exit
+fi
+
 rm -rf opk/
 mkdir opk/
 
