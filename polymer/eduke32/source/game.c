@@ -162,6 +162,10 @@ int32_t g_levelTextTime = 0;
 int32_t r_maxfps = 0;
 uint32_t g_frameDelay = 0;
 
+extern enum ScreenScaleMode_t screenscalemode;
+extern int32_t screencropoffset;
+void calculatescreenextents();
+
 #if defined(RENDERTYPEWIN) && defined(USE_OPENGL)
 extern char forcegl;
 #endif
@@ -10001,6 +10005,7 @@ CLEAN_DIRECTORY:
 
     OSD_Exec("autoexec.cfg");
 
+	screenscalemode = ud.config.ScreenScaleMode;
     if (setgamemode(ud.config.ScreenMode,ud.config.ScreenWidth,ud.config.ScreenHeight,ud.config.ScreenBPP) < 0)
     {
         int32_t i = 0;

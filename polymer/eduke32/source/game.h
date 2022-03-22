@@ -144,6 +144,7 @@ typedef struct {
         int32_t ScreenWidth;
         int32_t ScreenHeight;
         int32_t ScreenBPP;
+		int32_t ScreenScaleMode;
 
         int32_t ForceSetup;
         int32_t NoAutoLoad;

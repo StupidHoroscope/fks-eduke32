@@ -187,6 +187,7 @@ void CONFIG_SetDefaults(void)
     ud.config.ScreenWidth = 320;
     ud.config.ScreenHeight = 240;
     ud.config.ScreenMode = 0;
+	ud.config.ScreenScaleMode = 2;
 #if defined(POLYMOST) && defined(USE_OPENGL)
     ud.config.ScreenBPP = 32;
 #else
@@ -718,6 +719,7 @@ int32_t CONFIG_ReadSetup(void)
         SCRIPT_GetNumber(ud.config.scripthandle, "Screen Setup", "ScreenHeight",&ud.config.ScreenHeight);
         SCRIPT_GetNumber(ud.config.scripthandle, "Screen Setup", "ScreenMode",&ud.config.ScreenMode);
         SCRIPT_GetNumber(ud.config.scripthandle, "Screen Setup", "ScreenWidth",&ud.config.ScreenWidth);
+		SCRIPT_GetNumber(ud.config.scripthandle, "Screen Setup", "ScreenScaleMode", &ud.config.ScreenScaleMode);
 
 #ifdef RENDERTYPEWIN
         {
@@ -893,6 +895,7 @@ void CONFIG_WriteSetup(void)
     SCRIPT_PutNumber(ud.config.scripthandle, "Screen Setup", "ScreenHeight",ud.config.ScreenHeight,FALSE,FALSE);    // JBF 20031206
     SCRIPT_PutNumber(ud.config.scripthandle, "Screen Setup", "ScreenMode",ud.config.ScreenMode,FALSE,FALSE);    // JBF 20031206
     SCRIPT_PutNumber(ud.config.scripthandle, "Screen Setup", "ScreenWidth",ud.config.ScreenWidth,FALSE,FALSE);  // JBF 20031206
+	SCRIPT_PutNumber(ud.config.scripthandle, "Screen Setup", "ScreenScaleMode", ud.config.ScreenScaleMode, FALSE, FALSE);    // JBF 20031206
 
 #ifdef RENDERTYPEWIN
     SCRIPT_PutNumber(ud.config.scripthandle, "Screen Setup", "WindowPositioning", windowpos, FALSE, FALSE);

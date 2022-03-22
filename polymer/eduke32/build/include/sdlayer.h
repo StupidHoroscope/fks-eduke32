@@ -13,15 +13,13 @@ struct sdlappicon {
 	uint8_t *mask;
 };
 
-enum screenscalemode_t
+enum ScreenScaleMode_t
 {
-	SCREEN_Cropped,
-	SCREEN_Scaled,
-	SCREEN_Stretched
+	SCREENSCALE_CROPPED = 0,
+	SCREENSCALE_SCALED = 1,
+	SCREENSCALE_STRETCHED = 2,
+	SCREENSCALE_MAX
 };
-
-extern enum screenscalemode_t sscalemode;
-extern int32_t screencropoffset;
 
 #else
 #if (__build_interface_layer__ != SDL)

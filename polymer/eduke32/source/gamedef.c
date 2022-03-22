@@ -5321,6 +5321,7 @@ repeatcase:
             int32_t fullscreen = ud.config.ScreenMode;
             int32_t xdim = ud.config.ScreenWidth, ydim = ud.config.ScreenHeight, bpp = ud.config.ScreenBPP;
             int32_t usemouse = ud.config.UseMouse, usejoy = ud.config.UseJoystick;
+			int32_t screenscalemode = ud.config.ScreenScaleMode;
 #if defined(POLYMOST) && defined(USE_OPENGL)
             int32_t glrm = glrendmode;
 #endif
@@ -5363,6 +5364,7 @@ repeatcase:
             ud.config.ScreenWidth = xdim;
             ud.config.ScreenHeight = ydim;
             ud.config.ScreenBPP = bpp;
+			ud.config.ScreenScaleMode = screenscalemode;
             ud.config.UseMouse = usemouse;
             ud.config.UseJoystick = usejoy;
 #if defined(POLYMOST) && defined(USE_OPENGL)

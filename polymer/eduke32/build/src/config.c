@@ -5,6 +5,7 @@
 #include "build.h"
 #include "editor.h"
 #include "osd.h"
+#include "game.h"
 
 #ifdef RENDERTYPEWIN
 #include "winlayer.h"
@@ -59,6 +60,7 @@ extern int16_t brightness;
 extern int32_t vsync;
 extern char game_executable[BMAX_PATH];
 extern int32_t fullscreen;
+extern enum ScreenScaleMode_t screenscalemode;
 extern char option[9];
 extern char keys[NUMBUILDKEYS];
 extern char remap[256];
@@ -119,12 +121,23 @@ int32_t loadsetup(const char *fn)
 
     if (readconfig(fp, "forcesetup", val, VL) > 0) { if (Batoi(val) != 0) forcesetup = 1; else forcesetup = 0; }
     if (readconfig(fp, "fullscreen", val, VL) > 0) { if (Batoi(val) != 0) fullscreen = 1; else fullscreen = 0; }
-    if (readconfig(fp, "resolution", val, VL) > 0)
+
+	if (readconfig(fp, "resolution", val, VL) > 0)
     {
         i = Batoi(val) & 0x0f;
         if ((unsigned)i<13) { xdimgame = xdim2d = vesares[i][0]; ydimgame = ydim2d = vesares[i][1]; }
     }
-    if (readconfig(fp, "2dresolution", val, VL) > 0)
+
+	if (readconfig(fp, "screenscalemode", val, VL) > 0) 
+	{ 
+		screenscalemode = Batoi(val); 
+		if (screenscalemode < 0 || screenscalemode >= SCREENSCALE_MAX)
+		{
+			screenscalemode = 0;
+		}
+	}
+
+	if (readconfig(fp, "2dresolution", val, VL) > 0)
     {
         i = Batoi(val) & 0x0f;
         if ((unsigned)i<13) { xdim2d = vesares[i][0]; ydim2d = vesares[i][1]; }
@@ -312,6 +325,12 @@ int32_t writesetup(const char *fn)
              ";   1 - Fullscreen\n"
              "fullscreen = %d\n"
              "\n"
+             "; Screen Scale Mode selection\n"
+             ";   0 - Cropped\n"
+             ";   1 - Scaled\n"
+             ";   2 - Stretched\n"
+             "screenscalemode = %d\n"
+             "\n"
              "; Video resolution\n"
              "xdim2d = %d\n"
              "ydim2d = %d\n"
@@ -486,7 +505,7 @@ int32_t writesetup(const char *fn)
              "; remap = 10-3A,52-4C,53-B8\n"
              "remap = ",
 
-             forcesetup, fullscreen, xdim2d, ydim2d, xdimgame, ydimgame, bppgame, vsync,
+             forcesetup, fullscreen, screenscalemode, xdim2d, ydim2d, xdimgame, ydimgame, bppgame, vsync,
 #ifdef POLYMER
              glrendmode,
 #endif

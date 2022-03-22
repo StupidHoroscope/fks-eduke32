@@ -30,6 +30,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "premap.h"
 #include "demo.h"
 #include "crc32.h"
+#include "sdlayer.h"
 
 #include <sys/stat.h>
 
@@ -56,6 +57,9 @@ static int32_t soundbits, soundvoices, soundrate;
 static char *mousebuttonnames[] = { "Mouse1", "Mouse2", "Mouse3", "Mouse4", "Wheel Up", "Wheel Down", "Mouse5", "Mouse6", "Mouse7", "Mouse8"};
 
 extern int32_t voting;
+
+extern enum ScreenScaleMode_t screenscalemode;
+void calculatescreenextents();
 
 #define USERMAPENTRYLENGTH 25
 
@@ -3115,6 +3119,46 @@ cheat_for_port_credits:
             probey = 2;
             break;
 
+		case 0:
+			{
+				enum ScreenScaleMode_t newscalemode = screenscalemode;
+
+				if (KB_KeyPressed(sc_LeftArrow))
+				{
+					if (newscalemode > 0)
+					{
+						newscalemode--;
+					}
+					else
+					{
+						newscalemode = SCREENSCALE_MAX - 1;
+					}
+				}
+				else if (KB_KeyPressed(sc_RightArrow))
+				{
+					if (newscalemode < SCREENSCALE_MAX - 1)
+					{
+						newscalemode++;
+					}
+					else
+					{
+						newscalemode = 0;
+					}
+				}
+
+				if (newscalemode != screenscalemode)
+				{
+					screenscalemode = newscalemode;
+					ud.config.ScreenScaleMode = screenscalemode;
+					calculatescreenextents();
+				}
+
+				KB_ClearKeyDown(sc_LeftArrow);
+				KB_ClearKeyDown(sc_RightArrow);
+			}
+			break;
+
+/*
         case 0:
             do
             {
@@ -3326,6 +3370,7 @@ cheat_for_port_credits:
                 ud.config.ScreenBPP = bpp;
             }
             break;
+*/
 
         case 4:
             ChangeToMenu(231);
@@ -3365,6 +3410,13 @@ cheat_for_port_credits:
 #endif
         }
 
+		menutext(c, 50, MENUHIGHLIGHT(0), 0, "SCREEN SCALE");
+		char* sscaletext = screenscalemode == SCREENSCALE_CROPPED ? "Cropped" :
+			               screenscalemode == SCREENSCALE_SCALED ? "Scaled" :
+			               screenscalemode == SCREENSCALE_STRETCHED ? "Stretched" :
+			               "INVALID";
+		mgametext(c+168, 50-8, sscaletext, MENUHIGHLIGHT(0), 2+8+16);
+/*
         menutext(c,50,MENUHIGHLIGHT(0),0,"RESOLUTION");
         Bsprintf(tempbuf,"%d x %d",
                  (newvidmode==validmodecnt)?xdim:validmode[newvidmode].xdim,
@@ -3379,6 +3431,7 @@ cheat_for_port_credits:
         menutext(c+168,50+16+16,MENUHIGHLIGHT(2),0,newfullscreen?"YES":"NO");
 
         menutext(c+16,50+16+16+22,MENUHIGHLIGHT(3),changesmade==0,"APPLY CHANGES");
+*/
 
         menutext(c,50+62+16,MENUHIGHLIGHT(4),PHX(-6),"COLOR CORRECTION");
         /*        {

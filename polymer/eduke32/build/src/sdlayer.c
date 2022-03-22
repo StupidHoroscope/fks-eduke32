@@ -68,7 +68,7 @@ char modechange=1;
 char offscreenrendering=0;
 char videomodereset = 0;
 char nofog=0;
-enum screenscalemode_t sscalemode = SCREEN_Cropped;
+enum ScreenScaleMode_t screenscalemode;
 int32_t screencropoffset = 0;
 static uint16_t sysgamma[3][256];
 extern int32_t curbrightness, gammabrightness;
@@ -899,7 +899,7 @@ void calculatescreenextents()
 {
 	screencropoffset = 0;
 
-	if (sscalemode == SCREEN_Cropped)
+	if (screenscalemode == SCREENSCALE_CROPPED)
 	{
 		int croppedArea = 120 - xres / 2;
 
