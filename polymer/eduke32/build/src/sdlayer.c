@@ -60,6 +60,7 @@ char quitevent=0, appactive=1;
 
 // video
 static SDL_Surface *sdl_surface;
+static SDL_Surface *sdl_offscreen_surface = 0;
 int32_t xres=-1, yres=-1, bpp=0, fullscreen=0, bytesperline, imageSize;
 intptr_t frameplace=0;
 int32_t lockcount=0;
@@ -358,7 +359,7 @@ void initprintf(const char *f, ...)
 
     va_start(va, f);
     Bvsnprintf(buf, sizeof(buf), f, va);
-    va_end(va);
+	va_end(va);
 
     OSD_Printf(buf);
     Bprintf("%s", buf);
@@ -929,13 +930,19 @@ int32_t setvideomode(int32_t x, int32_t y, int32_t c, int32_t fs)
     {
         initprintf("Setting video mode %dx%d (%d-bpp %s)\n",
                    x,y,c, ((fs&1) ? "fullscreen" : "windowed"));
-        sdl_surface = SDL_SetVideoMode(x, y, c, SDL_HWSURFACE | SDL_DOUBLEBUF | SDL_FULLSCREEN);
+        sdl_surface = SDL_SetVideoMode(240, 240, 8, SDL_HWSURFACE | SDL_HWPALETTE | SDL_DOUBLEBUF | SDL_FULLSCREEN);
         if (!sdl_surface)
         {
             initprintf("Unable to set video mode!\n");
             return -1;
         }
-    }
+
+		sdl_offscreen_surface = SDL_CreateRGBSurface(SDL_HWSURFACE, x, y, 8, 0, 0, 0, 0);
+		if (!sdl_offscreen_surface)
+		{
+			initprintf("Couldn't create offscreen surface! Image may appear stretched\n");
+		}
+	}
 
 #if 0
     {
@@ -1168,6 +1175,14 @@ void resetvideomode(void)
 
 
 //
+// getrendersurface() -- gets the surface we want to render to
+//
+SDL_Surface* getrendersurface()
+{
+	return sdl_offscreen_surface ? sdl_offscreen_surface : sdl_surface;
+}
+
+//
 // begindrawing() -- locks the framebuffer for drawing
 //
 void begindrawing(void)
@@ -1190,12 +1205,14 @@ void begindrawing(void)
 
     if (offscreenrendering) return;
 
-    if (SDL_MUSTLOCK(sdl_surface)) SDL_LockSurface(sdl_surface);
-    frameplace = (intptr_t)sdl_surface->pixels;
+	SDL_Surface* rendersurface = getrendersurface();
 
-    if (sdl_surface->pitch != bytesperline || modechange)
+	if (SDL_MUSTLOCK(rendersurface)) SDL_LockSurface(rendersurface);
+	frameplace = (intptr_t)rendersurface->pixels;
+
+    if (rendersurface->pitch != bytesperline || modechange)
     {
-        bytesperline = sdl_surface->pitch;
+        bytesperline = rendersurface->pitch;
         imageSize = bytesperline*yres;
         setvlinebpl(bytesperline);
 
@@ -1211,7 +1228,10 @@ void begindrawing(void)
 //
 void enddrawing(void)
 {
-    if (bpp > 8)
+
+	SDL_Surface* rendersurface = getrendersurface();
+
+	if (bpp > 8)
     {
         if (!offscreenrendering) frameplace = 0;
         return;
@@ -1225,7 +1245,7 @@ void enddrawing(void)
 
     if (offscreenrendering) return;
 
-    if (SDL_MUSTLOCK(sdl_surface)) SDL_UnlockSurface(sdl_surface);
+	if (SDL_MUSTLOCK(rendersurface)) SDL_UnlockSurface(rendersurface);
 }
 
 
@@ -1282,6 +1302,34 @@ void showframe(int32_t w)
         while (lockcount) enddrawing();
     }
 
+	if (sdl_offscreen_surface)
+	{
+		int srcPosX = 120 - xres / 2;
+		int srcPosY = 120 - yres / 2;
+
+		SDL_Rect srcRect;
+		srcRect.x = srcPosX < 0 ? -srcPosX : 0;
+		srcRect.y = srcPosY < 0 ? -srcPosY : 0;
+		srcRect.w = xres - srcRect.x;
+		srcRect.h = yres - srcRect.y;
+
+		SDL_Rect dstRect;
+		dstRect.x = srcPosX > 0 ? srcPosX : 0;
+		dstRect.y = srcPosY > 0 ? srcPosY : 0;
+		dstRect.w = min(xres, 240);
+		dstRect.h = min(yres, 240);
+
+		// Clear the screen
+		Uint32 clearColor = SDL_MapRGB(sdl_surface->format, 0, 0, 0);
+		SDL_FillRect(sdl_surface, 0, clearColor);
+
+		// Blit the offscreen buffer
+		if (SDL_BlitSurface(sdl_offscreen_surface, &srcRect, sdl_surface, &dstRect))
+		{
+			initprintf("BLIT ERROR: %s", SDL_GetError());
+		}
+	}
+
     SDL_Flip(sdl_surface);
 }
 
@@ -1303,7 +1351,30 @@ int32_t setpalette(int32_t start, int32_t num)
 
     //return SDL_SetPalette(sdl_surface, SDL_LOGPAL|SDL_PHYSPAL, pal, 0, 256);
 
-    return sdl_surface ? SDL_SetColors(sdl_surface, pal, 0, 256) : 0;
+ 	initprintf("offscreen palette\n");
+ 	if (sdl_offscreen_surface)
+ 	{
+ 		if (!SDL_SetColors(sdl_offscreen_surface, pal, 0, 256))
+ 		{
+ 			initprintf("Failed to set colors for offscreen surface\n");
+ 			return 0;
+ 		}
+ 	}
+
+	initprintf("sdl palette\n");
+	if (sdl_surface)
+	{
+		if (!SDL_SetColors(sdl_surface, pal, 0, 256))
+		{
+			initprintf("Failed to set colors for palette\n");
+			return 0;
+		}
+	}
+
+	initprintf("palettes finished\n");
+
+	return 1;
+//    return (sdl_offscreen_surface ? SDL_SetColors(sdl_surface, pal, 0, 256)  sdl_surface ? SDL_SetColors(sdl_surface, pal, 0, 256) : 0;
 }
 
 //
@@ -1879,8 +1950,8 @@ static int32_t buildkeytranslationtable(void)
 	MAP(SDLK_a, sc_Return);		// Fire/Accept
 	MAP(SDLK_b, sc_Space);		// Open/Strafe
 	MAP(SDLK_x, sc_A);			// Jump
-	MAP(SDLK_y, sc_Z);			// Crouch
-	MAP(SDLK_m, sc_LeftShift);	// Run
+	MAP(SDLK_m, sc_Z);			// Crouch
+	MAP(SDLK_y, sc_LeftShift);	// Run
 	MAP(SDLK_v, sc_CapsLock);	// Toggle Auto-Run
 	MAP(SDLK_n, sc_F);			// Quick-Kick
 	MAP(SDLK_o, sc_Q);			// Use Inventory

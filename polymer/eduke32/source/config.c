@@ -193,7 +193,7 @@ void CONFIG_SetDefaults(void)
     ud.config.ScreenBPP = 8;
 #endif
 #if defined(FUNKEYS)
-	ud.config.ScreenWidth = 240;
+	ud.config.ScreenWidth = 320;
 	ud.config.ScreenHeight = 240;
 	ud.config.ScreenBPP = 8;
 #endif
