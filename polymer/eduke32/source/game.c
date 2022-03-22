@@ -52,6 +52,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "anim.h"
 #include "demo.h"
 
+#include "sdlayer.h"
+
 #define ROTATESPRITE_MAX 2048
 
 #if KRANDDEBUG
@@ -226,16 +228,20 @@ inline void G_SetStatusBarScale(int32_t sc)
     G_UpdateScreenArea();
 }
 
+#define SBL (screencropoffset)
+#define SBR (320l - screencropoffset)
+
 static inline int32_t sbarx(int32_t x)
 {
+	x += SBL;
     if (ud.screen_size == 4 /*|| ud.statusbarmode == 1*/) return scale(x<<16,ud.statusbarscale,100);
-    return (((320l<<16) - scale(320l<<16,ud.statusbarscale,100)) >> 1) + scale(x<<16,ud.statusbarscale,100);
+    return (((SBR<<16) - scale(SBR <<16,ud.statusbarscale,100)) >> 1) + scale(x<<16,ud.statusbarscale,100);
 }
 
 static inline int32_t sbarxr(int32_t x)
 {
-    if (ud.screen_size == 4 /*|| ud.statusbarmode == 1*/) return (320l<<16) - scale(x<<16,ud.statusbarscale,100);
-    return (((320l<<16) - scale(320l<<16,ud.statusbarscale,100)) >> 1) + scale(x<<16,ud.statusbarscale,100);
+    if (ud.screen_size == 4 /*|| ud.statusbarmode == 1*/) return (SBR<<16) - scale(x<<16,ud.statusbarscale,100);
+    return (((SBR<<16) - scale(SBR <<16,ud.statusbarscale,100)) >> 1) + scale(x<<16,ud.statusbarscale,100);
 }
 
 static inline int32_t sbary(int32_t y)

@@ -68,6 +68,8 @@ char modechange=1;
 char offscreenrendering=0;
 char videomodereset = 0;
 char nofog=0;
+enum screenscalemode_t sscalemode = SCREEN_Cropped;
+int32_t screencropoffset = 0;
 static uint16_t sysgamma[3][256];
 extern int32_t curbrightness, gammabrightness;
 #ifdef USE_OPENGL
@@ -889,6 +891,24 @@ int32_t checkvideomode(int32_t *x, int32_t *y, int32_t c, int32_t fs, int32_t fo
     return nearest;		// JBF 20031206: Returns the mode number
 }
 
+//
+// calculatescreenextents() -- work out the offset for the left and right sides of the screen
+//
+
+void calculatescreenextents()
+{
+	screencropoffset = 0;
+
+	if (sscalemode == SCREEN_Cropped)
+	{
+		int croppedArea = 120 - xres / 2;
+
+		if (croppedArea < 0)
+		{
+			screencropoffset = -croppedArea;
+		}
+	}
+}
 
 //
 // setvideomode() -- set SDL video mode
@@ -1139,6 +1159,7 @@ int32_t setvideomode(int32_t x, int32_t y, int32_t c, int32_t fs)
     modechange=1;
     videomodereset = 0;
     OSD_ResizeDisplay(xres,yres);
+	calculatescreenextents();
 
     // save the current system gamma to determine if gamma is available
     if (!gammabrightness)
