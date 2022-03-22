@@ -3094,19 +3094,17 @@ cheat_for_port_credits:
         c = (320>>1)-120;
 
 #if defined(POLYMOST) && defined(USE_OPENGL)
-        x = (7/*+(getrendermode() >= 3)*/);
+        x = (4/*+(getrendermode() >= 3)*/);
 #else
-        x = 7;
+        x = 4;
 #endif
-        onbar = (!getrendermode() && probey == 6); // (probey == 4);
-        if (probey == 0 || probey == 1 || probey == 2)
+        onbar = (!getrendermode() && probey == 3); // (probey == 4);
+        if (probey == 0)
             x = M_Probe(c,50,16,x);
-        else if (probey == 3)
-            x = M_Probe(c,50+16+16+22,0,x);
         else
             x = M_Probe(c,50+62-16-16-16,16,x);
 
-        if ((probey==0 || probey==1 || probey==2) && (KB_KeyPressed(sc_LeftArrow) || KB_KeyPressed(sc_RightArrow)))
+        if ((probey==0) && (KB_KeyPressed(sc_LeftArrow) || KB_KeyPressed(sc_RightArrow)))
         {
             S_PlaySound(PISTOL_BODYHIT);
             x=probey;
@@ -3372,11 +3370,11 @@ cheat_for_port_credits:
             break;
 */
 
-        case 4:
+        case 1:
             ChangeToMenu(231);
             break;
 
-        case 5:
+        case 2:
             if (!getrendermode())
             {
                 ud.detail = 1-ud.detail;
@@ -3403,7 +3401,7 @@ cheat_for_port_credits:
                 gltexfiltermode = 0;
             gltexapplyprops();
             break;
-        case 6:
+        case 3:
             if (!getrendermode()) break;
             ChangeToMenu(230);
             break;
@@ -3433,7 +3431,7 @@ cheat_for_port_credits:
         menutext(c+16,50+16+16+22,MENUHIGHLIGHT(3),changesmade==0,"APPLY CHANGES");
 */
 
-        menutext(c,50+62+16,MENUHIGHLIGHT(4),PHX(-6),"COLOR CORRECTION");
+        menutext(c,50+62+16,MENUHIGHLIGHT(1),PHX(-6),"COLOR CORRECTION");
         /*        {
                     short ss = ud.brightness;
                     bar(c+171,50+62+16,&ss,8,x==4,MENUHIGHLIGHT(4),PHX(-6));
@@ -3448,13 +3446,13 @@ cheat_for_port_credits:
         {
             int32_t i = (int32_t)(r_ambientlight*1024.f);
             int32_t j = i;
-            menutext(c,50+62+16+16,MENUHIGHLIGHT(5),0,"PIXEL DOUBLING");
-            menutext(c+168,50+62+16+16,MENUHIGHLIGHT(5),0,ud.detail?"OFF":"ON");
-            modval(0,1,(int32_t *)&ud.detail,1,probey==5);
-            menutext(c,50+62+16+16+16,MENUHIGHLIGHT(6),PHX(-6),"AMBIENT LIGHT");
-            _bar(0,c+185,50+62+16+16+16,&i,128,x==6,MENUHIGHLIGHT(6),g_netServer || numplayers>1,128,4096);
+            menutext(c,50+62+16+16,MENUHIGHLIGHT(2),0,"PIXEL DOUBLING");
+            menutext(c+168,50+62+16+16,MENUHIGHLIGHT(2),0,ud.detail?"OFF":"ON");
+            modval(0,1,(int32_t *)&ud.detail,1,probey==2);
+            menutext(c,50+62+16+16+16,MENUHIGHLIGHT(3),PHX(-6),"AMBIENT LIGHT");
+            _bar(0,c+185,50+62+16+16+16,&i,128,x==3,MENUHIGHLIGHT(3),g_netServer || numplayers>1,128,4096);
             Bsprintf(tempbuf,"%.2f",r_ambientlight);
-            mgametextpal(c+185+9,50+62+16+16+16+4, tempbuf, MENUHIGHLIGHT(6), 0);
+            mgametextpal(c+185+9,50+62+16+16+16+4, tempbuf, MENUHIGHLIGHT(3), 0);
 
             if (i != j)
             {
@@ -3466,7 +3464,7 @@ cheat_for_port_credits:
         else
         {
             int32_t filter = gltexfiltermode;
-            menutext(c,50+62+16+16,MENUHIGHLIGHT(5),0,"TEXTURE FILTER");
+            menutext(c,50+62+16+16,MENUHIGHLIGHT(2),0,"TEXTURE FILTER");
             switch (gltexfiltermode)
             {
             case 0:
@@ -3491,11 +3489,11 @@ cheat_for_port_credits:
                 strcpy(tempbuf,"OTHER");
                 break;
             }
-            modval(0,5,(int32_t *)&gltexfiltermode,1,probey==5);
+            modval(0,5,(int32_t *)&gltexfiltermode,1,probey==2);
             if (gltexfiltermode != filter)
                 gltexapplyprops();
-            mgametextpal(c+168,50+62+16+16-8,tempbuf,MENUHIGHLIGHT(5),!getrendermode());
-            menutext(c,50+62+16+16+16,MENUHIGHLIGHT(6),bpp==8,"RENDERER SETUP");
+            mgametextpal(c+168,50+62+16+16-8,tempbuf,MENUHIGHLIGHT(2),!getrendermode());
+            menutext(c,50+62+16+16+16,MENUHIGHLIGHT(3),bpp==8,"RENDERER SETUP");
         }
 #endif
         break;
@@ -3510,8 +3508,6 @@ cheat_for_port_credits:
 
         if (probey == NUMGAMEFUNCTIONS)
             x = probesm(60,145,0,NUMGAMEFUNCTIONS+2);
-        else if (probey == NUMGAMEFUNCTIONS+1)
-            x = probesm(60,152,0,NUMGAMEFUNCTIONS+2);
         else x = probesm(0,0,0,NUMGAMEFUNCTIONS+2);
 
         if (x==-1)
@@ -3522,11 +3518,6 @@ cheat_for_port_credits:
         else if (x == NUMGAMEFUNCTIONS)
         {
             CONFIG_SetDefaultKeys(0);
-            break;
-        }
-        else if (x == NUMGAMEFUNCTIONS+1)
-        {
-            CONFIG_SetDefaultKeys(1);
             break;
         }
         else if (x>=0)
@@ -3557,7 +3548,7 @@ cheat_for_port_credits:
             KB_ClearKeyDown(sc_Tab);
             S_PlaySound(KICK_HIT);
         }
-        else if (KB_KeyPressed(sc_BackSpace))
+        else if (KB_KeyPressed(sc_BackSpace) || KB_KeyPressed(sc_N))
         {
             char key[2];
             key[0] = ud.config.KeyboardKeys[probey][0];
@@ -3565,7 +3556,8 @@ cheat_for_port_credits:
             ud.config.KeyboardKeys[probey][currentlist] = 0xff;
             CONFIG_MapKey(probey, ud.config.KeyboardKeys[probey][0], key[0], ud.config.KeyboardKeys[probey][1], key[1]);
             S_PlaySound(KICK_HIT);
-            KB_ClearKeyDown(sc_BackSpace);
+			KB_ClearKeyDown(sc_BackSpace);
+			KB_ClearKeyDown(sc_N);
         }
 
         for (l=min(13,NUMGAMEFUNCTIONS)-1; l >= 0 ; l--)
@@ -3592,8 +3584,7 @@ cheat_for_port_credits:
 
 //        mgametextpal(160,140,  "RESET KEYS TO DEFAULTS",MENUHIGHLIGHT(NUMGAMEFUNCTIONS),10);
 //        mgametextpal(160,140+7,"SET CLASSIC KEY LAYOUT",MENUHIGHLIGHT(NUMGAMEFUNCTIONS+1),10);
-        mgametextpal(160,140,  "SET KEY LAYOUT #1 (GCW0 STYLE)",MENUHIGHLIGHT(NUMGAMEFUNCTIONS),10);
-        mgametextpal(160,140+7,"SET KEY LAYOUT #2 (A320 STYLE)",MENUHIGHLIGHT(NUMGAMEFUNCTIONS+1),10);
+        mgametextpal(160,140,  "RESET KEYS TO DEFAULTS",MENUHIGHLIGHT(NUMGAMEFUNCTIONS),10);
         mgametext(160,144+9+3,"UP/DOWN = SELECT ACTION",0,2+8+16);
         mgametext(160,144+9+9+3,"LEFT/RIGHT = SELECT LIST",0,2+8+16);
         mgametext(160,144+9+9+9+3,"A = MODIFY   R = CLEAR",0,2+8+16);
@@ -3609,10 +3600,10 @@ cheat_for_port_credits:
         mgametext(320>>1,90,"PRESS THE KEY TO ASSIGN AS",0,2+8+16);
         Bsprintf(tempbuf,"%s FOR \"%s\"", whichkey?"SECONDARY":"PRIMARY", CONFIG_FunctionNumToName(function));
         mgametext(320>>1,90+9,tempbuf,0,2+8+16);
-        mgametext(320>>1,90+9+9+9,"PRESS \"SELECT\" TO CANCEL",0,2+8+16);
+        mgametext(320>>1,90+9+9+9,"PRESS \"START\" TO CANCEL",0,2+8+16);
 
         sc = KB_GetLastScanCode();
-        if (sc != sc_None || RMB)
+        if ((sc != sc_None && sc != sc_K) || RMB) // sc_K is the Fn button on the FunKey S; we ignore it so we can bind Fn + <Other Button> combinations
         {
             if (sc == sc_Escape || RMB)
             {
@@ -5045,9 +5036,9 @@ VOLUME_ALL_40x:
         c = 320>>1;
 
         mgametext(c,90,"Are you sure you want to quit?",0,2+8+16);
-        mgametext(c,99,"(A Yes/B No)",0,2+8+16);
+        mgametext(c,99,"(A: Yes    B: No)",0,2+8+16);
 
-        if (KB_KeyPressed(sc_LeftControl) || KB_KeyPressed(sc_Enter) || KB_KeyPressed(sc_kpad_Enter) || KB_KeyPressed(sc_Y) || LMB)
+        if (KB_KeyPressed(sc_LeftControl) || KB_KeyPressed(sc_Enter) || KB_KeyPressed(sc_kpad_Enter) || KB_KeyPressed(sc_A) || LMB)
         {
             KB_FlushKeyboardQueue();
 
@@ -5055,9 +5046,9 @@ VOLUME_ALL_40x:
         }
 
         x = M_Probe(186,124,0,1);
-        if (x == -1 || KB_KeyPressed(sc_N) || RMB)
+        if (x == -1 || KB_KeyPressed(sc_B) || RMB)
         {
-            KB_ClearKeyDown(sc_N);
+            KB_ClearKeyDown(sc_B);
             g_quitDeadline = 0;
             if (g_player[myconnectindex].ps->gm &MODE_DEMO && ud.recstat == 2)
                 g_player[myconnectindex].ps->gm = MODE_DEMO;
@@ -5083,9 +5074,9 @@ VOLUME_ALL_40x:
     case 501:
         c = 320>>1;
         mgametext(c,90,"Quit to Title?",0,2+8+16);
-        mgametext(c,99,"(A Yes/B No)",0,2+8+16);
+        mgametext(c,99,"(A: Yes     B: No)",0,2+8+16);
 
-        if (KB_KeyPressed(sc_LeftControl) || KB_KeyPressed(sc_Enter) || KB_KeyPressed(sc_kpad_Enter) || KB_KeyPressed(sc_Y) || LMB)
+        if (KB_KeyPressed(sc_LeftControl) || KB_KeyPressed(sc_Enter) || KB_KeyPressed(sc_kpad_Enter) || KB_KeyPressed(sc_A) || LMB)
         {
             KB_FlushKeyboardQueue();
             g_player[myconnectindex].ps->gm = MODE_DEMO;
@@ -5096,7 +5087,7 @@ VOLUME_ALL_40x:
 
         x = M_Probe(186,124,0,0);
 
-        if (x == -1 || KB_KeyPressed(sc_N) || RMB)
+        if (x == -1 || KB_KeyPressed(sc_B) || RMB)
         {
             g_player[myconnectindex].ps->gm &= ~MODE_MENU;
             if ((!g_netServer && ud.multimode < 2)  && ud.recstat != 2)

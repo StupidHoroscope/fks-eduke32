@@ -458,34 +458,44 @@ int32_t initinput(void)
 		case SDLK_RIGHT:
 			Bstrncpy((char *)key_names[ keytranslation[i] ], "D-PAD Right", sizeof(key_names[i])-1);
 			break;
-		case SDLK_LCTRL:
+		case SDLK_h:
+			Bstrncpy((char *)key_names[keytranslation[i]], "Fn + D-PAD Down", sizeof(key_names[i]) - 1);
+			break;
+		case SDLK_j:
+			Bstrncpy((char *)key_names[keytranslation[i]], "Fn + D-PAD Left", sizeof(key_names[i]) - 1);
+			break;
+		case SDLK_i:
+			Bstrncpy((char *)key_names[keytranslation[i]], "Fn + D-PAD Right", sizeof(key_names[i]) - 1);
+			break;
+		case SDLK_a:
 			Bstrncpy((char *)key_names[ keytranslation[i] ], "A", sizeof(key_names[i])-1);
 			break;
-		case SDLK_LALT:
+		case SDLK_b:
 			Bstrncpy((char *)key_names[ keytranslation[i] ], "B", sizeof(key_names[i])-1);
 			break;
-		case SDLK_LSHIFT:
-			Bstrncpy((char *)key_names[ keytranslation[i] ], "X", sizeof(key_names[i])-1); // GCW0
-			//Bstrncpy((char *)key_names[ keytranslation[i] ], "Y", sizeof(key_names[i])-1); // A320
+		case SDLK_x:
+			Bstrncpy((char *)key_names[ keytranslation[i] ], "X", sizeof(key_names[i])-1);
 			break;
-		case SDLK_SPACE:
-			Bstrncpy((char *)key_names[ keytranslation[i] ], "Y", sizeof(key_names[i])-1); // GCW0
-			//Bstrncpy((char *)key_names[ keytranslation[i] ], "X", sizeof(key_names[i])-1); // A320
+		case SDLK_y:
+			Bstrncpy((char *)key_names[ keytranslation[i] ], "Y", sizeof(key_names[i])-1);
 			break;
-		case SDLK_TAB:
-			Bstrncpy((char *)key_names[ keytranslation[i] ], "Left shoulder", sizeof(key_names[i])-1);
+		case SDLK_v:
+			Bstrncpy((char *)key_names[ keytranslation[i] ], "Fn + L shoulder", sizeof(key_names[i])-1);
 			break;
-		case SDLK_BACKSPACE:
-			Bstrncpy((char *)key_names[ keytranslation[i] ], "Right shoulder", sizeof(key_names[i])-1);
+		case SDLK_m:
+			Bstrncpy((char *)key_names[ keytranslation[i] ], "L shoulder", sizeof(key_names[i])-1);
 			break;
-		case SDLK_RETURN:
+		case SDLK_o:
+			Bstrncpy((char *)key_names[keytranslation[i]], "Fn + R shoulder", sizeof(key_names[i]) - 1);
+			break;
+		case SDLK_n:
+			Bstrncpy((char *)key_names[ keytranslation[i] ], "R shoulder", sizeof(key_names[i])-1);
+			break;
+		case SDLK_s:
 			Bstrncpy((char *)key_names[ keytranslation[i] ], "Start", sizeof(key_names[i])-1);
 			break;
-		case SDLK_ESCAPE:
-			Bstrncpy((char *)key_names[ keytranslation[i] ], "Select", sizeof(key_names[i])-1);
-			break;
-		case SDLK_PAUSE:
-			Bstrncpy((char *)key_names[ keytranslation[i] ], "Lock", sizeof(key_names[i])-1);
+		case SDLK_q:
+			Bstrncpy((char *)key_names[ keytranslation[i] ], "Menu", sizeof(key_names[i])-1);
 			break;
 		default:
 			Bstrncpy((char *)key_names[ keytranslation[i] ], SDL_GetKeyName(i), sizeof(key_names[i])-1);
@@ -2044,24 +2054,28 @@ static int32_t buildkeytranslationtable(void)
 	// TODO: Figure out why this #if defined isn't working
 #if 1 //defined(FUNKEYS)
 	initprintf("Loading Funkey-S key translation table...\n");
+	// We leave some of the
 	MAP(SDLK_u, sc_UpArrow);
 	MAP(SDLK_d, sc_DownArrow);
 	MAP(SDLK_l, sc_LeftArrow);
 	MAP(SDLK_r, sc_RightArrow);
+
+	// We leave these two as their PC equivalents so they can be used for the menu
 	MAP(SDLK_a, sc_Return);		// Fire/Accept
-	MAP(SDLK_b, sc_Space);		// Open/Strafe
-	MAP(SDLK_x, sc_A);			// Jump
-	MAP(SDLK_m, sc_Z);			// Crouch
-	MAP(SDLK_y, sc_LeftShift);	// Run
-	MAP(SDLK_v, sc_CapsLock);	// Toggle Auto-Run
-	MAP(SDLK_n, sc_F);			// Quick-Kick
-	MAP(SDLK_o, sc_Q);			// Use Inventory
-	//MAP(SDLK_n, 0x1a);			// Inventory Left
-	MAP(SDLK_h, 0x1b);			// Inventory Right
-	MAP(SDLK_j, sc_Comma);		// Previous Weapon
-	MAP(SDLK_i, sc_Period);		// Next Weapon
 	MAP(SDLK_s, sc_Escape);		// Menu
-	MAP(SDLK_q, sc_Tab);		// Map
+
+	MAP(SDLK_b, sc_B);			// Open/Strafe
+	MAP(SDLK_x, sc_X);			// Jump
+	MAP(SDLK_m, sc_M);			// Crouch
+	MAP(SDLK_y, sc_Y);			// Run
+	MAP(SDLK_v, sc_V);			// Toggle Auto-Run
+	MAP(SDLK_n, sc_N);			// Quick-Kick
+	MAP(SDLK_o, sc_O);			// Use Inventory
+	//MAP(SDLK_n, 0x1a);		// Inventory Left
+	MAP(SDLK_h, sc_H);			// Inventory Right
+	MAP(SDLK_j, sc_J);			// Previous Weapon
+	MAP(SDLK_i, sc_I);			// Next Weapon
+	MAP(SDLK_q, sc_Q);			// Map
 #endif
 
 #undef MAP
