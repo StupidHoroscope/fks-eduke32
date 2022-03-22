@@ -1269,6 +1269,42 @@ void enddrawing(void)
 	if (SDL_MUSTLOCK(rendersurface)) SDL_UnlockSurface(rendersurface);
 }
 
+//
+// blitstretched() -- transfer graphics from one surface to another, while applying nearest-neighbor scaling
+//
+void blitstretched(SDL_Surface* srcSurface, SDL_Rect* srcRect, SDL_Surface* dstSurface, SDL_Rect* dstRect)
+{
+	float factorX = (float)srcRect->w / (float)dstRect->w;
+	float factorY = (float)srcRect->h / (float)dstRect->h;
+
+	if (SDL_MUSTLOCK(srcSurface)) SDL_LockSurface(srcSurface);
+	if (SDL_MUSTLOCK(dstSurface)) SDL_LockSurface(dstSurface);
+
+	intptr_t srcPixels = (intptr_t)srcSurface->pixels;
+	intptr_t dstPixels = (intptr_t)dstSurface->pixels;
+
+	for (int y = 0; y < dstRect->h; y++)
+	{
+		for (int x = 0; x < dstRect->w; x++)
+		{
+			int sx = srcRect->x + (int)(x * factorX);
+			int sy = srcRect->y + (int)(y * factorY);
+			int dx = dstRect->x + x;
+			int dy = dstRect->y + y;
+
+			if (sx >= 0 && sx < srcSurface->w &&
+				sy >= 0 && sy < srcSurface->h &&
+				dx >= 0 && dx < dstSurface->w &&
+				dy >= 0 && dy < dstSurface->h)
+			{
+				drawpixel(dstPixels + ((dy * dstSurface->pitch) + dx), *(char*)(srcPixels + ((sy * srcSurface->pitch) + sx)));
+			}
+		}
+	}
+
+	if (SDL_MUSTLOCK(srcSurface)) SDL_UnlockSurface(srcSurface);
+	if (SDL_MUSTLOCK(dstSurface)) SDL_UnlockSurface(dstSurface);
+}
 
 //
 // showframe() -- update the display
@@ -1325,29 +1361,77 @@ void showframe(int32_t w)
 
 	if (sdl_offscreen_surface)
 	{
-		int srcPosX = 120 - xres / 2;
-		int srcPosY = 120 - yres / 2;
-
-		SDL_Rect srcRect;
-		srcRect.x = srcPosX < 0 ? -srcPosX : 0;
-		srcRect.y = srcPosY < 0 ? -srcPosY : 0;
-		srcRect.w = xres - srcRect.x;
-		srcRect.h = yres - srcRect.y;
-
-		SDL_Rect dstRect;
-		dstRect.x = srcPosX > 0 ? srcPosX : 0;
-		dstRect.y = srcPosY > 0 ? srcPosY : 0;
-		dstRect.w = min(xres, 240);
-		dstRect.h = min(yres, 240);
-
 		// Clear the screen
 		Uint32 clearColor = SDL_MapRGB(sdl_surface->format, 0, 0, 0);
 		SDL_FillRect(sdl_surface, 0, clearColor);
 
-		// Blit the offscreen buffer
-		if (SDL_BlitSurface(sdl_offscreen_surface, &srcRect, sdl_surface, &dstRect))
+		if (screenscalemode == SCREENSCALE_CROPPED)
 		{
-			initprintf("BLIT ERROR: %s", SDL_GetError());
+			int srcPosX = 120 - xres / 2;
+			int srcPosY = 120 - yres / 2;
+
+			SDL_Rect srcRect;
+			srcRect.x = srcPosX < 0 ? -srcPosX : 0;
+			srcRect.y = srcPosY < 0 ? -srcPosY : 0;
+			srcRect.w = xres - srcRect.x;
+			srcRect.h = yres - srcRect.y;
+
+			SDL_Rect dstRect;
+			dstRect.x = srcPosX > 0 ? srcPosX : 0;
+			dstRect.y = srcPosY > 0 ? srcPosY : 0;
+			dstRect.w = min(xres, 240);
+			dstRect.h = min(yres, 240);
+
+			// Blit the offscreen buffer
+			if (SDL_BlitSurface(sdl_offscreen_surface, &srcRect, sdl_surface, &dstRect))
+			{
+				initprintf("BLIT ERROR: %s", SDL_GetError());
+			}
+		}
+		else if (screenscalemode == SCREENSCALE_STRETCHED)
+		{
+			SDL_Rect srcRect;
+			srcRect.x = 0;
+			srcRect.y = 0;
+			srcRect.w = xres;
+			srcRect.h = yres;
+
+			SDL_Rect dstRect;
+			dstRect.x = 0;
+			dstRect.y = 0;
+			dstRect.w = 240;
+			dstRect.h = 240;
+
+			blitstretched(sdl_offscreen_surface, &srcRect, sdl_surface, &dstRect);
+		}
+		else if (screenscalemode == SCREENSCALE_SCALED)
+		{
+			SDL_Rect srcRect;
+			srcRect.x = 0;
+			srcRect.y = 0;
+			srcRect.w = xres;
+			srcRect.h = yres;
+
+			SDL_Rect dstRect;
+			dstRect.x = 0;
+			dstRect.y = 0;
+			dstRect.w = 240;
+			dstRect.h = 240;
+
+			float srcAspect = (float)yres / (float)xres;
+
+			if (srcAspect > 1.0f)
+			{
+				dstRect.w = (int)((float)dstRect.h / srcAspect);
+				dstRect.x = 120 - dstRect.w / 2;
+			}
+			else if (srcAspect < 1.0f)
+			{
+				dstRect.h = (int)((float)dstRect.w * srcAspect);
+				dstRect.y = 120 - dstRect.h / 2;
+			}
+
+			blitstretched(sdl_offscreen_surface, &srcRect, sdl_surface, &dstRect);
 		}
 	}
 
