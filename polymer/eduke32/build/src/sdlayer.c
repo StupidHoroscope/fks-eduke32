@@ -1372,7 +1372,6 @@ int32_t setpalette(int32_t start, int32_t num)
 
     //return SDL_SetPalette(sdl_surface, SDL_LOGPAL|SDL_PHYSPAL, pal, 0, 256);
 
- 	initprintf("offscreen palette\n");
  	if (sdl_offscreen_surface)
  	{
  		if (!SDL_SetColors(sdl_offscreen_surface, pal, 0, 256))
@@ -1382,7 +1381,6 @@ int32_t setpalette(int32_t start, int32_t num)
  		}
  	}
 
-	initprintf("sdl palette\n");
 	if (sdl_surface)
 	{
 		if (!SDL_SetColors(sdl_surface, pal, 0, 256))
@@ -1391,8 +1389,6 @@ int32_t setpalette(int32_t start, int32_t num)
 			return 0;
 		}
 	}
-
-	initprintf("palettes finished\n");
 
 	return 1;
 //    return (sdl_offscreen_surface ? SDL_SetColors(sdl_surface, pal, 0, 256)  sdl_surface ? SDL_SetColors(sdl_surface, pal, 0, 256) : 0;
