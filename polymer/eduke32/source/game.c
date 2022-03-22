@@ -1780,7 +1780,7 @@ void G_PrintGameQuotes(void)
         return;
     }
 
-    k = 0;
+    k = 4;
 
     if (g_player[screenpeek].ps->ftq == 115 || g_player[screenpeek].ps->ftq == 116 || g_player[screenpeek].ps->ftq == 117)
     {
