@@ -16,6 +16,7 @@
 #include "a.h"
 #include "build.h"
 #include "osd.h"
+#include "scancodes.h"
 
 #if (SDL_MAJOR_VERSION == 1 && SDL_MINOR_VERSION < 3) // SDL 1.2
 // for SDL_WaitEventTimeout defined below
@@ -1740,9 +1741,9 @@ inline void idle_waitevent_timeout(uint32_t timeout)
 #if (SDL_MAJOR_VERSION == 1 && SDL_MINOR_VERSION < 3) // SDL 1.2
 static int32_t buildkeytranslationtable(void)
 {
-    memset(keytranslation,0,sizeof(keytranslation));
-
+	memset(keytranslation, 0, sizeof(keytranslation));
 #define MAP(x,y) keytranslation[x] = y
+
     MAP(SDLK_BACKSPACE,	0xe);
     MAP(SDLK_TAB,		0xf);
     MAP(SDLK_RETURN,	0x1c);
@@ -1867,6 +1868,30 @@ static int32_t buildkeytranslationtable(void)
     MAP(SDLK_SYSREQ,	0x54);	// alt+printscr
     MAP(SDLK_BREAK,		0xb7);	// ctrl+pause
     MAP(SDLK_MENU,		0xdd);	// win menu?
+
+	// TODO: Figure out why this #if defined isn't working
+#if 1 //defined(FUNKEYS)
+	initprintf("Loading Funkey-S key translation table...\n");
+	MAP(SDLK_u, sc_UpArrow);
+	MAP(SDLK_d, sc_DownArrow);
+	MAP(SDLK_l, sc_LeftArrow);
+	MAP(SDLK_r, sc_RightArrow);
+	MAP(SDLK_a, sc_Return);		// Fire/Accept
+	MAP(SDLK_b, sc_Space);		// Open/Strafe
+	MAP(SDLK_x, sc_A);			// Jump
+	MAP(SDLK_y, sc_Z);			// Crouch
+	MAP(SDLK_m, sc_LeftShift);	// Run
+	MAP(SDLK_v, sc_CapsLock);	// Toggle Auto-Run
+	MAP(SDLK_n, sc_F);			// Quick-Kick
+	MAP(SDLK_o, sc_Q);			// Use Inventory
+	//MAP(SDLK_n, 0x1a);			// Inventory Left
+	MAP(SDLK_h, 0x1b);			// Inventory Right
+	MAP(SDLK_j, sc_Comma);		// Previous Weapon
+	MAP(SDLK_i, sc_Period);		// Next Weapon
+	MAP(SDLK_s, sc_Escape);		// Menu
+	MAP(SDLK_q, sc_Tab);		// Map
+#endif
+
 #undef MAP
 
     return 0;
@@ -1874,7 +1899,7 @@ static int32_t buildkeytranslationtable(void)
 #else // if SDL 1.3
 static int32_t buildkeytranslationtable(void)
 {
-    memset(keytranslation,0,sizeof(keytranslation));
+	memset(keytranslation, 0, sizeof(keytranslation));
 
 #define MAP(x,y) keytranslation[x] = y
     printf("%d\n",SDL_SCANCODE_BACKSPACE);
