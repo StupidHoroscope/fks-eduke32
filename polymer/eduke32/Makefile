@@ -26,7 +26,7 @@ RELEASE?=1
 DEBUGANYWAY?=0
 KRANDDEBUG?=0
 NOSOUND?=0
-OPTLEVEL?=3
+OPTLEVEL?=2
 PROFILER?=0
 
 ifneq (0,$(KRANDDEBUG))
@@ -71,19 +71,23 @@ JAUDIOLIB=libjfaudiolib.a
 ENETDIR=$(SRC)/enet
 ENETLIB=libenet.a
 
-CC=mipsel-gcw0-linux-uclibc-gcc
-CXX=mipsel-gcw0-linux-uclibc-g++
+CHAINPREFIX ?= /opt/FunKey-sdk-2.3.0
+CROSS_COMPILE ?= $(CHAINPREFIX)/bin/arm-funkey-linux-musleabihf-
+
+CC    ?= $(CROSS_COMPILE)gcc
+CXX   ?= $(CROSS_COMPILE)g++
+LD    ?= $(CROSS_COMPILE)ld
+STRIP ?= $(CROSS_COMPILE)strip
+#RC    ?= $(CROSS_COMPILE)windres
 #AS=nasm
-RC=mipsel-gcw0-linux-uclibc-windres
-STRIP=mipsel-gcw0-linux-uclibc-strip
-ARCH=-fstrength-reduce -fthread-jumps -fexpensive-optimizations -fomit-frame-pointer -frename-registers -pipe -G 0 -ffast-math
+ARCH=-fstrength-reduce -fthread-jumps -fexpensive-optimizations -fomit-frame-pointer -frename-registers -pipe -ffast-math
 #CC=gcc
 #CXX=g++
 #RC=windres
 #STRIP=strip
 
-SDLCONFIG=/opt/gcw0-toolchain/usr/mipsel-gcw0-linux-uclibc/sysroot/usr/bin/sdl-config
-SDL_FRAMEWORK=/opt/gcw0-toolchain/usr/mipsel-gcw0-linux-uclibc/sysroot/usr/include/
+SDLCONFIG=/opt/FunKey-sdk-2.3.0/arm-funkey-linux-musleabihf/sysroot/usr/bin/
+SDL_FRAMEWORK=/opt/FunKey-sdk-2.3.0/arm-funkey-linux-musleabihf/sysroot/usr/include/
 
 OURCFLAGS=$(debug) -W -Wall -Wimplicit \
     -funsigned-char -fno-strict-aliasing -DNO_GCC_BUILTINS \
@@ -191,7 +195,7 @@ else
     ifeq ($(RENDERTYPE),SDL)
         ifeq (0,$(SDL_FRAMEWORK))
             OURCFLAGS+= $(subst -Dmain=SDL_main,,$(shell $(SDLCONFIG) --cflags))
-            LIBS+= -lSDL_mixer
+            LIBS+= -lSDL_mixer -lmikmod
         else
             OURCFLAGS   += -DSDL_FRAMEWORK
         endif
@@ -227,12 +231,12 @@ endif
 
 # TARGETS
 
-all: notice eduke32$(EXESUFFIX) mapster32$(EXESUFFIX)
+all: notice eduke32$(EXESUFFIX) #mapster32$(EXESUFFIX)
 
 all:
 	$(BUILD_FINISHED)
 	@ls -l eduke32$(EXESUFFIX)
-	@ls -l mapster32$(EXESUFFIX)
+#	@ls -l mapster32$(EXESUFFIX)
 
 notice:
 	$(BUILD_STARTED)

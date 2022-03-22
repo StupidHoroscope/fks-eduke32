@@ -1,4 +1,4 @@
-CC=mipsel-gcw0-linux-uclibc-gcc
+#CC=gcc
 #CC=gcc
 OBJ=obj
 OBJNAME?=libjfaudiolib.a
@@ -28,7 +28,7 @@ CFLAGS=$(debug) -W -Wall -Wimplicit -Werror-implicit-function-declaration \
     -funsigned-char -fno-strict-aliasing -DNO_GCC_BUILTINS -D_FORTIFY_SOURCE=2 \
     $(F_JUMP_TABLES) $(F_NO_STACK_PROTECTOR)
 
-CPPFLAGS=-Iinclude -Isrc -DHAVE_VORBIS
+CPPFLAGS=-Iinclude -Isrc -I/opt/FunKey-sdk-2.3.0/arm-funkey-linux-musleabihf/sysroot/usr/include/ -DHAVE_VORBIS
 
 OBJECTS=$(OBJ)/drivers.o \
 	$(OBJ)/fx_man.o \

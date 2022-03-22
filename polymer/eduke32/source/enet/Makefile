@@ -1,4 +1,4 @@
-CC=mipsel-gcw0-linux-uclibc-gcc
+#CC=gcc
 #CC=gcc
 OBJ=obj
 OBJNAME?=libenet.a

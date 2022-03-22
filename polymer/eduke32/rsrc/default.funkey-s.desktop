@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=Duke 3D
+Comment=Duke Nukem 3D
+Terminal=false
+Type=Application
+Exec=eduke32
+Icon=eduke32
+Categories=games
+SelectorFilter=grp

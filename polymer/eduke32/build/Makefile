@@ -62,6 +62,7 @@ OBJ?=obj.gnu
 SRC=src
 RSRC=rsrc
 INC=include
+SDL_INC=/opt/FunKey-sdk-2.3.0/arm-funkey-linux-musleabihf/sysroot/usr/include/
 
 # ENETROOT=$(SRC)/enet
 
@@ -94,13 +95,18 @@ ifneq (0,$(DEBUGANYWAY))
     debug+=-ggdb
 endif
 
-CC=mipsel-gcw0-linux-uclibc-gcc
-CXX=mipsel-gcw0-linux-uclibc-g++
+CHAINPREFIX ?= /opt/FunKey-sdk-2.3.0
+CROSS_COMPILE ?= $(CHAINPREFIX)/bin/arm-funkey-linux-musleabihf-
+
+CC    ?= $(CROSS_COMPILE)gcc
+CXX   ?= $(CROSS_COMPILE)g++
+#CC=gcc
+#CXX=g++
 #AS=nasm
-RC=mipsel-gcw0-linux-uclibc-windres
-AR=mipsel-gcw0-linux-uclibc-ar
-RANLIB=mipsel-gcw0-linux-uclibc-ranlib
-ARCH=-fstrength-reduce -fthread-jumps -fexpensive-optimizations -fomit-frame-pointer -frename-registers -pipe -G 0 -ffast-math
+#RC=windres
+#AR=ar
+RANLIB ?= $(CROSS_COMPILE)ranlib
+ARCH=-fstrength-reduce -fthread-jumps -fexpensive-optimizations -fomit-frame-pointer -frename-registers -pipe -g0 -ffast-math
 #CC=gcc
 #CXX=g++
 #RC=windres
@@ -109,7 +115,7 @@ ARCH=-fstrength-reduce -fthread-jumps -fexpensive-optimizations -fomit-frame-poi
 
 OURCFLAGS=$(debug) -W -Wall -Wimplicit \
 	-Wno-char-subscripts -funsigned-char -fno-strict-aliasing -DNO_GCC_BUILTINS \
-	-DKSFORBUILD -I$(INC) -D_FORTIFY_SOURCE=2 \
+	-DKSFORBUILD -I$(INC) -I$(SDL_INC) -D_FORTIFY_SOURCE=2 \
     $(F_JUMP_TABLES) $(ARCH)
 
 OURCXXFLAGS=-fno-exceptions -fno-rtti

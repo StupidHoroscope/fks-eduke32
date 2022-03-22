@@ -149,9 +149,9 @@ if (FUNKEYS)
     -march=armv7-a -mtune=cortex-a7 -mfpu=neon -mfloat-abi=hard -ffast-math
   )
   target_link_libraries(eduke32 SDL_sound)
-
-  link_directories(/home/jack/Desktop/dev/FunKey-OS/SDK/output/host/arm-funkey-linux-musleabihf/sysroot/usr/bin/../../usr/lib)
-  include_directories(/home/jack/Desktop/dev/FunKey-OS/SDK/output/host/arm-funkey-linux-musleabihf/sysroot/usr/bin/../../usr/include/SDL)
+    
+  link_directories(/opt/FunKey-sdk-2.3.0/arm-funkey-linux-musleabihf/sysroot/usr/lib/)
+  include_directories(/opt/FunKey-sdk-2.3.0/arm-funkey-linux-musleabihf/sysroot/usr/include/SDL/)
 else()
   target_link_libraries(eduke32 m)
 endif()
