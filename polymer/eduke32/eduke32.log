@@ -1,47 +1,50 @@
-EDuke32 2.0.0devel 20100727
-Application parameters: -connect 127.0.0.1 
-Connection to 127.0.0.1:23513 succeeded.
-Using /tmp/eduke32/polymer/eduke32/ for game data
-Using /home/zear/.eduke32/ for game data
-Initializing SDL system interface (compiled against SDL version 1.2.15, found version 1.2.15)
-Using "x11" video driver
-No fullscreen modes available!
-Searching for game data...
-Using 'duke3d.grp' as main game data file.
-Compiling: GAME.CON (151133 bytes)
-Including: DEFS.CON (35992 bytes)
-Including: USER.CON (45449 bytes)
-GAME.CON: In state `blimphitstate':
-GAME.CON:476: warning: expected action, found define.
-GAME.CON: In actor `ORGANTIC':
-GAME.CON:3969: warning: found `else' with no `if'.
-GAME.CON: In state `pigshootenemystate':
-GAME.CON:5892: warning: found `else' with no `if'.
-Found 3 warning(s), 0 error(s).
-Resizing code buffer to 16189*4 bytes
-Script compiled in 22ms, 16181*4b, version 1.4+
-1917/11264 labels, 321/2048 variables
-125 quotes, 207 actors
-Initialized 24,0M cache
-RTS file DUKE.RTS was not found
-Initializing OSD...
-1 joystick(s) found
-  1. Chicony USB Wireless HID Receiver
-Joystick 1 has 36 axes, 6 buttons, and 0 hat(s).
-Executing "settings.cfg"
-Setting video mode 320x240 (16-bpp windowed)
-Initializing music...
-Error: couldn't open any of the following files:
-/etc/timidity/freepats.cfg
-/etc/timidity/timidity.cfg
-/etc/timidity.cfg
-Error: couldn't open any of the following files:
-/etc/timidity/freepats.cfg
-/etc/timidity/timidity.cfg
-/etc/timidity.cfg
-S_MusicStartup(): failed initializing
-Initializing Cache timCache tiE1L1: HOLE1L1: HOLLYWOOD HZEAR has ZEAR has ZEAR is history!
-ZEAR disconnected.
- 
-Wrote eduke32.cfg
-Wrote settings.cfg
+﻿  
+  Microsoft (R) Program Maintenance Utility Version 14.16.27042.0
+  Copyright (C) Microsoft Corporation.  All rights reserved.
+  
+  	cl /c /MT /J /nologo /Od /Zi   /Isource /Ibuild\include\msvc /Ibuild\include\ /Isource\jmact /Isource\jaudiolib\include /Isource\enet\include  /W2 /DSUPERBUILD /DPOLYMOST /DUSE_OPENGL /DPOLYMER  /I"C:\Program Files\Microsoft DirectX SDK (February 2010)"\include /DRENDERTYPEWIN=1 /DDEBUGGINGAIDS /D "_CRT_SECURE_NO_DEPRECATE" /Foobj_win/game.obj source\game.c
+  game.c
+  	cl /c /MT /J /nologo /Od /Zi   /Isource /Ibuild\include\msvc /Ibuild\include\ /Isource\jmact /Isource\jaudiolib\include /Isource\enet\include  /W2 /DSUPERBUILD /DPOLYMOST /DUSE_OPENGL /DPOLYMER  /I"C:\Program Files\Microsoft DirectX SDK (February 2010)"\include /DRENDERTYPEWIN=1 /DDEBUGGINGAIDS /D "_CRT_SECURE_NO_DEPRECATE" /Foobj_win/actors.obj source\actors.c
+  actors.c
+  	cl /c /MT /J /nologo /Od /Zi   /Isource /Ibuild\include\msvc /Ibuild\include\ /Isource\jmact /Isource\jaudiolib\include /Isource\enet\include  /W2 /DSUPERBUILD /DPOLYMOST /DUSE_OPENGL /DPOLYMER  /I"C:\Program Files\Microsoft DirectX SDK (February 2010)"\include /DRENDERTYPEWIN=1 /DDEBUGGINGAIDS /D "_CRT_SECURE_NO_DEPRECATE" /Foobj_win/anim.obj source\anim.c
+  anim.c
+  	cl /c /MT /J /nologo /Od /Zi   /Isource /Ibuild\include\msvc /Ibuild\include\ /Isource\jmact /Isource\jaudiolib\include /Isource\enet\include  /W2 /DSUPERBUILD /DPOLYMOST /DUSE_OPENGL /DPOLYMER  /I"C:\Program Files\Microsoft DirectX SDK (February 2010)"\include /DRENDERTYPEWIN=1 /DDEBUGGINGAIDS /D "_CRT_SECURE_NO_DEPRECATE" /Foobj_win/demo.obj source\demo.c
+  demo.c
+  	cl /c /MT /J /nologo /Od /Zi   /Isource /Ibuild\include\msvc /Ibuild\include\ /Isource\jmact /Isource\jaudiolib\include /Isource\enet\include  /W2 /DSUPERBUILD /DPOLYMOST /DUSE_OPENGL /DPOLYMER  /I"C:\Program Files\Microsoft DirectX SDK (February 2010)"\include /DRENDERTYPEWIN=1 /DDEBUGGINGAIDS /D "_CRT_SECURE_NO_DEPRECATE" /Foobj_win/gamedef.obj source\gamedef.c
+  gamedef.c
+  	cl /c /MT /J /nologo /Od /Zi   /Isource /Ibuild\include\msvc /Ibuild\include\ /Isource\jmact /Isource\jaudiolib\include /Isource\enet\include  /W2 /DSUPERBUILD /DPOLYMOST /DUSE_OPENGL /DPOLYMER  /I"C:\Program Files\Microsoft DirectX SDK (February 2010)"\include /DRENDERTYPEWIN=1 /DDEBUGGINGAIDS /D "_CRT_SECURE_NO_DEPRECATE" /Foobj_win/gameexec.obj source\gameexec.c
+  gameexec.c
+  	cl /c /MT /J /nologo /Od /Zi   /Isource /Ibuild\include\msvc /Ibuild\include\ /Isource\jmact /Isource\jaudiolib\include /Isource\enet\include  /W2 /DSUPERBUILD /DPOLYMOST /DUSE_OPENGL /DPOLYMER  /I"C:\Program Files\Microsoft DirectX SDK (February 2010)"\include /DRENDERTYPEWIN=1 /DDEBUGGINGAIDS /D "_CRT_SECURE_NO_DEPRECATE" /Foobj_win/gamevars.obj source\gamevars.c
+  gamevars.c
+  	cl /c /MT /J /nologo /Od /Zi   /Isource /Ibuild\include\msvc /Ibuild\include\ /Isource\jmact /Isource\jaudiolib\include /Isource\enet\include  /W2 /DSUPERBUILD /DPOLYMOST /DUSE_OPENGL /DPOLYMER  /I"C:\Program Files\Microsoft DirectX SDK (February 2010)"\include /DRENDERTYPEWIN=1 /DDEBUGGINGAIDS /D "_CRT_SECURE_NO_DEPRECATE" /Foobj_win/global.obj source\global.c
+  global.c
+  	cl /c /MT /J /nologo /Od /Zi   /Isource /Ibuild\include\msvc /Ibuild\include\ /Isource\jmact /Isource\jaudiolib\include /Isource\enet\include  /W2 /DSUPERBUILD /DPOLYMOST /DUSE_OPENGL /DPOLYMER  /I"C:\Program Files\Microsoft DirectX SDK (February 2010)"\include /DRENDERTYPEWIN=1 /DDEBUGGINGAIDS /D "_CRT_SECURE_NO_DEPRECATE" /Foobj_win/menus.obj source\menus.c
+  menus.c
+source\menus.c(2440): warning C4305: 'initializing': truncation from 'double' to 'float'
+  	cl /c /MT /J /nologo /Od /Zi   /Isource /Ibuild\include\msvc /Ibuild\include\ /Isource\jmact /Isource\jaudiolib\include /Isource\enet\include  /W2 /DSUPERBUILD /DPOLYMOST /DUSE_OPENGL /DPOLYMER  /I"C:\Program Files\Microsoft DirectX SDK (February 2010)"\include /DRENDERTYPEWIN=1 /DDEBUGGINGAIDS /D "_CRT_SECURE_NO_DEPRECATE" /Foobj_win/namesdyn.obj source\namesdyn.c
+  namesdyn.c
+  	cl /c /MT /J /nologo /Od /Zi   /Isource /Ibuild\include\msvc /Ibuild\include\ /Isource\jmact /Isource\jaudiolib\include /Isource\enet\include  /W2 /DSUPERBUILD /DPOLYMOST /DUSE_OPENGL /DPOLYMER  /I"C:\Program Files\Microsoft DirectX SDK (February 2010)"\include /DRENDERTYPEWIN=1 /DDEBUGGINGAIDS /D "_CRT_SECURE_NO_DEPRECATE" /Foobj_win/net.obj source\net.c
+  net.c
+  	cl /c /MT /J /nologo /Od /Zi   /Isource /Ibuild\include\msvc /Ibuild\include\ /Isource\jmact /Isource\jaudiolib\include /Isource\enet\include  /W2 /DSUPERBUILD /DPOLYMOST /DUSE_OPENGL /DPOLYMER  /I"C:\Program Files\Microsoft DirectX SDK (February 2010)"\include /DRENDERTYPEWIN=1 /DDEBUGGINGAIDS /D "_CRT_SECURE_NO_DEPRECATE" /Foobj_win/player.obj source\player.c
+  player.c
+  	cl /c /MT /J /nologo /Od /Zi   /Isource /Ibuild\include\msvc /Ibuild\include\ /Isource\jmact /Isource\jaudiolib\include /Isource\enet\include  /W2 /DSUPERBUILD /DPOLYMOST /DUSE_OPENGL /DPOLYMER  /I"C:\Program Files\Microsoft DirectX SDK (February 2010)"\include /DRENDERTYPEWIN=1 /DDEBUGGINGAIDS /D "_CRT_SECURE_NO_DEPRECATE" /Foobj_win/premap.obj source\premap.c
+  premap.c
+  	cl /c /MT /J /nologo /Od /Zi   /Isource /Ibuild\include\msvc /Ibuild\include\ /Isource\jmact /Isource\jaudiolib\include /Isource\enet\include  /W2 /DSUPERBUILD /DPOLYMOST /DUSE_OPENGL /DPOLYMER  /I"C:\Program Files\Microsoft DirectX SDK (February 2010)"\include /DRENDERTYPEWIN=1 /DDEBUGGINGAIDS /D "_CRT_SECURE_NO_DEPRECATE" /Foobj_win/savegame.obj source\savegame.c
+  savegame.c
+  	cl /c /MT /J /nologo /Od /Zi   /Isource /Ibuild\include\msvc /Ibuild\include\ /Isource\jmact /Isource\jaudiolib\include /Isource\enet\include  /W2 /DSUPERBUILD /DPOLYMOST /DUSE_OPENGL /DPOLYMER  /I"C:\Program Files\Microsoft DirectX SDK (February 2010)"\include /DRENDERTYPEWIN=1 /DDEBUGGINGAIDS /D "_CRT_SECURE_NO_DEPRECATE" /Foobj_win/sector.obj source\sector.c
+  sector.c
+  	cl /c /MT /J /nologo /Od /Zi   /Isource /Ibuild\include\msvc /Ibuild\include\ /Isource\jmact /Isource\jaudiolib\include /Isource\enet\include  /W2 /DSUPERBUILD /DPOLYMOST /DUSE_OPENGL /DPOLYMER  /I"C:\Program Files\Microsoft DirectX SDK (February 2010)"\include /DRENDERTYPEWIN=1 /DDEBUGGINGAIDS /D "_CRT_SECURE_NO_DEPRECATE" /Foobj_win/rts.obj source\rts.c
+  rts.c
+  	cl /c /MT /J /nologo /Od /Zi   /Isource /Ibuild\include\msvc /Ibuild\include\ /Isource\jmact /Isource\jaudiolib\include /Isource\enet\include  /W2 /DSUPERBUILD /DPOLYMOST /DUSE_OPENGL /DPOLYMER  /I"C:\Program Files\Microsoft DirectX SDK (February 2010)"\include /DRENDERTYPEWIN=1 /DDEBUGGINGAIDS /D "_CRT_SECURE_NO_DEPRECATE" /Foobj_win/config.obj source\config.c
+  config.c
+  	cl /c /MT /J /nologo /Od /Zi   /Isource /Ibuild\include\msvc /Ibuild\include\ /Isource\jmact /Isource\jaudiolib\include /Isource\enet\include  /W2 /DSUPERBUILD /DPOLYMOST /DUSE_OPENGL /DPOLYMER  /I"C:\Program Files\Microsoft DirectX SDK (February 2010)"\include /DRENDERTYPEWIN=1 /DDEBUGGINGAIDS /D "_CRT_SECURE_NO_DEPRECATE" /Foobj_win/animlib.obj source\jmact\animlib.c
+  animlib.c
+  	cl /c /MT /J /nologo /Od /Zi   /Isource /Ibuild\include\msvc /Ibuild\include\ /Isource\jmact /Isource\jaudiolib\include /Isource\enet\include  /W2 /DSUPERBUILD /DPOLYMOST /DUSE_OPENGL /DPOLYMER  /I"C:\Program Files\Microsoft DirectX SDK (February 2010)"\include /DRENDERTYPEWIN=1 /DDEBUGGINGAIDS /D "_CRT_SECURE_NO_DEPRECATE" /Foobj_win/osdfuncs.obj source\osdfuncs.c
+  osdfuncs.c
+  	cl /c /MT /J /nologo /Od /Zi   /Isource /Ibuild\include\msvc /Ibuild\include\ /Isource\jmact /Isource\jaudiolib\include /Isource\enet\include  /W2 /DSUPERBUILD /DPOLYMOST /DUSE_OPENGL /DPOLYMER  /I"C:\Program Files\Microsoft DirectX SDK (February 2010)"\include /DRENDERTYPEWIN=1 /DDEBUGGINGAIDS /D "_CRT_SECURE_NO_DEPRECATE" /Foobj_win/osdcmds.obj source\osdcmds.c
+  osdcmds.c
+  	cl /c /MT /J /nologo /Od /Zi   /Isource /Ibuild\include\msvc /Ibuild\include\ /Isource\jmact /Isource\jaudiolib\include /Isource\enet\include  /W2 /DSUPERBUILD /DPOLYMOST /DUSE_OPENGL /DPOLYMER  /I"C:\Program Files\Microsoft DirectX SDK (February 2010)"\include /DRENDERTYPEWIN=1 /DDEBUGGINGAIDS /D "_CRT_SECURE_NO_DEPRECATE" /Foobj_win/grpscan.obj source\grpscan.c
+  grpscan.c
+  	cl /c /MT /J /nologo /Od /Zi   /Isource /Ibuild\include\msvc /Ibuild\include\ /Isource\jmact /Isource\jaudiolib\include /Isource\enet\include  /W2 /DSUPERBUILD /DPOLYMOST /DUSE_OPENGL /DPOLYMER  /I"C:\Program Files\Microsoft DirectX SDK (February 2010)"\include /DRENDERTYPEWIN=1 /DDEBUGGINGAIDS /D "_CRT_SECURE_NO_DEPRECATE" /Foobj_win/winbits.obj source\winbits.c
+  winbits.c
+C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\IDE\VC\VCTargets\Microsoft.MakeFile.Targets(44,5): warning MSB5021: Terminating the task executable "cmd" and its child processes because the build was canceled.
