@@ -1293,9 +1293,9 @@ void M_DisplayMenus(void)
         Bsprintf(tempbuf,"\"%s\"",ud.savegame[g_lastSaveSlot]);
         mgametext(160,99,tempbuf,0,2+8+16);
 
-        mgametext(160,99+9,"(A Yes/B No)",0,2+8+16);
+        mgametext(160,99+9,"A: Yes     B: No",0,2+8+16);
 
-        if (KB_KeyPressed(sc_Escape) || KB_KeyPressed(sc_LeftAlt) || KB_KeyPressed(sc_N) || RMB)
+        if (KB_KeyPressed(sc_Escape) || KB_KeyPressed(sc_LeftAlt) || KB_KeyPressed(sc_N) || KB_KeyPressed(sc_B) || RMB)
         {
             if (sprite[g_player[myconnectindex].ps->i].extra <= 0)
             {
@@ -1304,7 +1304,8 @@ void M_DisplayMenus(void)
             }
 
             KB_ClearKeyDown(sc_N);
-            KB_ClearKeyDown(sc_Escape);
+			KB_ClearKeyDown(sc_B);
+			KB_ClearKeyDown(sc_Escape);
             KB_ClearKeyDown(sc_LeftAlt);
 
             g_player[myconnectindex].ps->gm &= ~MODE_MENU;
@@ -1468,7 +1469,7 @@ void M_DisplayMenus(void)
         mgametext(160,90,"LOAD game:",0,2+8+16);
         Bsprintf(tempbuf,"\"%s\"",ud.savegame[g_currentMenu-1000]);
         mgametext(160,99,tempbuf,0,2+8+16);
-        mgametext(160,99+9,"(A Yes/B No)",0,2+8+16);
+        mgametext(160,99+9,"A: Yes     B: No",0,2+8+16);
 
         if (KB_KeyPressed(sc_LeftControl) || KB_KeyPressed(sc_Enter) || KB_KeyPressed(sc_kpad_Enter) || KB_KeyPressed(sc_Y) || LMB)
         {
@@ -1491,9 +1492,10 @@ void M_DisplayMenus(void)
 
         //M_Probe(186,124+9,0,0); // this prevents from reading other keys than sc_N
 
-        if (KB_KeyPressed(sc_N) || KB_KeyPressed(sc_Escape) || KB_KeyPressed(sc_LeftAlt) || RMB)
+        if (KB_KeyPressed(sc_N) || KB_KeyPressed(sc_Escape) || KB_KeyPressed(sc_LeftAlt) || KB_KeyPressed(sc_B) || RMB)
         {
-            KB_ClearKeyDown(sc_N);
+			KB_ClearKeyDown(sc_N);
+			KB_ClearKeyDown(sc_B);
             KB_ClearKeyDown(sc_Escape);
             KB_ClearKeyDown(sc_LeftAlt);
             S_PlaySound(EXITMENUSOUND);
@@ -1524,9 +1526,10 @@ void M_DisplayMenus(void)
             KB_FlushKeyboardQueue();
             ChangeToMenu(100);
         }
-        if (KB_KeyPressed(sc_N) || KB_KeyPressed(sc_Escape) || KB_KeyPressed(sc_LeftAlt) || RMB)
+		if (KB_KeyPressed(sc_N) || KB_KeyPressed(sc_Escape) || KB_KeyPressed(sc_LeftAlt) || KB_KeyPressed(sc_B) || RMB)
         {
-            KB_ClearKeyDown(sc_N);
+			KB_ClearKeyDown(sc_N);
+			KB_ClearKeyDown(sc_B);
             KB_ClearKeyDown(sc_Escape);
             KB_ClearKeyDown(sc_LeftAlt);
             if ((!g_netServer && ud.multimode < 2) && ud.recstat != 2)
@@ -1540,7 +1543,7 @@ void M_DisplayMenus(void)
         }
         M_Probe(186,124,0,0);
         mgametext(160,90,"ABORT this game?",0,2+8+16);
-        mgametext(160,90+9,"(A Yes/B No)",0,2+8+16);
+        mgametext(160,90+9,"A: Yes     B: No",0,2+8+16);
 
         break;
 
@@ -1572,7 +1575,7 @@ void M_DisplayMenus(void)
         M_DisplaySaveGameList();
 
         mgametext(160,90,"OVERWRITE previous SAVED game?",0,2+8+16);
-        mgametext(160,90+9,"(A Yes/B No)",0,2+8+16);
+        mgametext(160,90+9,"A: Yes     B: No",0,2+8+16);
 
         if (KB_KeyPressed(sc_LeftControl) || KB_KeyPressed(sc_Enter) || KB_KeyPressed(sc_kpad_Enter) || KB_KeyPressed(sc_Y) || LMB)
         {
@@ -1583,9 +1586,10 @@ void M_DisplayMenus(void)
             KB_FlushKeyboardQueue();
             break;
         }
-        if (KB_KeyPressed(sc_N) || KB_KeyPressed(sc_Escape) || KB_KeyPressed(sc_LeftAlt) || RMB)
+        if (KB_KeyPressed(sc_N) || KB_KeyPressed(sc_B) || KB_KeyPressed(sc_Escape) || KB_KeyPressed(sc_LeftAlt) || RMB)
         {
-            KB_ClearKeyDown(sc_N);
+			KB_ClearKeyDown(sc_N);
+			KB_ClearKeyDown(sc_B);
             KB_ClearKeyDown(sc_Escape);
             KB_ClearKeyDown(sc_LeftAlt);
             ChangeToMenu(351);
@@ -5036,7 +5040,7 @@ VOLUME_ALL_40x:
         c = 320>>1;
 
         mgametext(c,90,"Are you sure you want to quit?",0,2+8+16);
-        mgametext(c,99,"(A: Yes    B: No)",0,2+8+16);
+        mgametext(c,99,"A: Yes     B: No",0,2+8+16);
 
         if (KB_KeyPressed(sc_LeftControl) || KB_KeyPressed(sc_Enter) || KB_KeyPressed(sc_kpad_Enter) || KB_KeyPressed(sc_A) || LMB)
         {
@@ -5074,7 +5078,7 @@ VOLUME_ALL_40x:
     case 501:
         c = 320>>1;
         mgametext(c,90,"Quit to Title?",0,2+8+16);
-        mgametext(c,99,"(A: Yes     B: No)",0,2+8+16);
+        mgametext(c,99,"A: Yes     B: No",0,2+8+16);
 
         if (KB_KeyPressed(sc_LeftControl) || KB_KeyPressed(sc_Enter) || KB_KeyPressed(sc_kpad_Enter) || KB_KeyPressed(sc_A) || LMB)
         {
