@@ -198,8 +198,10 @@ static char sctoasc[2][256] = {
 
 int32_t KB_KeyWaiting(void)
 {
-    return bkbhit();
-//	return (keyfifoplc != keyfifoend);
+	char c = bgetchar();
+
+	return c != 0 && 
+		   c != 'k'; // FUNKEY HACK: Stops Fn button from skipping screens
 }
 
 char KB_Getch(void)
