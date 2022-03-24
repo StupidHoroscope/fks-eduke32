@@ -85,6 +85,7 @@ int32_t g_noSetup = 0;
 static int32_t g_noAutoLoad = 0;
 static int32_t g_noSound = 0;
 static int32_t g_noMusic = 0;
+static int32_t g_loadInstantPlay = 0;
 static char *CommandMap = NULL;
 static char *CommandName = NULL;
 int32_t g_forceWeaponChoice = 0;
@@ -8313,11 +8314,11 @@ static void G_CheckCommandLine(int32_t argc, const char **argv)
     g_player[0].wchoice[9] = 1;
 
     if (argc > 1)
-    {
-        initprintf("Application parameters: ");
+	{
+		initprintf("Application parameters: ");
         while (i < argc)
             initprintf("%s ",argv[i++]);
-        initprintf("\n");
+		initprintf("\n");
 
         i = 1;
         while (i < argc)
@@ -8539,6 +8540,13 @@ static void G_CheckCommandLine(int32_t argc, const char **argv)
                     i++;
                     continue;
                 }
+				if (!Bstrcasecmp(c+1, "instantplay"))
+				{
+					g_loadInstantPlay = 1;
+					i++;
+					continue;
+				}
+
 #if defined(RENDERTYPEWIN) && defined(USE_OPENGL)
                 if (!Bstrcasecmp(c+1,"forcegl"))
                 {
@@ -10073,7 +10081,23 @@ MAIN_LOOP_RESTART:
     G_GetCrosshairColor();
     G_SetCrosshairColor(CrosshairColors.r, CrosshairColors.g, CrosshairColors.b);
 
-    if (ud.warp_on == 0)
+	if (g_loadInstantPlay)
+	{
+		printf("Loading instant play...\n");
+		if (G_LoadPlayer(INSTANT_PLAY_SAVESPOT) == 0)
+		{
+			printf("Instant Play loading successful!\n");
+			g_loadInstantPlay = 0;
+
+			// Open the menu to pause the game so people aren't immediately thrust into combat
+			g_player[myconnectindex].ps->gm |= MODE_MENU;
+			ChangeToMenu(0);
+
+			// Don't show the level name
+			g_levelTextTime = 0;
+		}
+	}
+    else if (ud.warp_on == 0)
     {
         if ((g_netServer || ud.multimode > 1) && boardfilename[0] != 0)
         {

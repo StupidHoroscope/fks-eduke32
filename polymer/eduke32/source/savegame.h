@@ -23,6 +23,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #ifndef __savegame_h__
 #define __savegame_h__
 
+#define INSTANT_PLAY_SAVESPOT -1
+
 #pragma pack(push,1)
 struct savehead 
 {

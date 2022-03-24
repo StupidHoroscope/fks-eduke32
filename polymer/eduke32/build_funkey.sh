@@ -11,7 +11,7 @@ fi
 rm -rf opk/
 mkdir opk/
 
-cp ./rsrc/{eduke32.png,default.funkey-s.desktop} ./opk/
+cp -r ./rsrcopk/* ./opk/
 cp ./eduke32 ./opk/
 
 rm -f *.opk

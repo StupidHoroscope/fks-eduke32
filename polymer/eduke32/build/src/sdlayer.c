@@ -17,6 +17,7 @@
 #include "build.h"
 #include "osd.h"
 #include "scancodes.h"
+#include "../../source/savegame.h"
 
 #if (SDL_MAJOR_VERSION == 1 && SDL_MINOR_VERSION < 3) // SDL 1.2
 // for SDL_WaitEventTimeout defined below
@@ -57,6 +58,7 @@ const char **_buildargv = NULL;
 extern int32_t app_main(int32_t argc, const char *argv[]);
 
 char quitevent=0, appactive=1;
+int32_t wantspoweroff = 0;
 
 // video
 static SDL_Surface *sdl_surface;
@@ -169,6 +171,15 @@ void wm_setapptitle(char *name)
 //
 //
 
+/* Handler for SIGUSR1, caused by closing the console */
+void handle_sigusr1(int sig)
+{
+	printf("Caught signal USR1 %d\n", sig);
+
+	/* Signal to quick save and poweoff after next loop */
+	wantspoweroff = 1;
+}
+
 int32_t main(int32_t argc, char *argv[])
 {
     int32_t r;
@@ -187,7 +198,7 @@ int32_t main(int32_t argc, char *argv[])
 #endif
     startwin_open();
 
-    _buildargc = argc;
+	_buildargc = argc;
     _buildargv = (const char**)argv;
 
 #if defined(USE_OPENGL) && defined(POLYMOST)
@@ -279,6 +290,7 @@ int32_t initsystem(void)
     signal(SIGSEGV, sighandler);
     signal(SIGABRT, sighandler);
     signal(SIGFPE, sighandler);
+	signal(SIGUSR1, handle_sigusr1);
 
     atexit(uninitsystem);
 
@@ -1562,6 +1574,50 @@ static SDL_Surface * loadappicon(void)
 //
 //
 
+#define SHELL_CMD_POWERDOWN                 "powerdown"
+#define SHELL_CMD_POWERDOWN_HANDLE          "powerdown handle"
+#define SHELL_CMD_INSTANT_PLAY              "instant_play"
+
+/* Quick save and turn off the console */
+void quicksaveandpoweroff()
+{
+	FILE *fp;
+
+	Bprintf("Save Instant Play file\n");
+
+	/* Send command to cancel any previously scheduled powerdown */
+	fp = popen(SHELL_CMD_POWERDOWN_HANDLE, "r");
+	if (fp == NULL)
+	{
+		/* Countdown is still ticking, so better do nothing
+	   than start writing and get interrupted!
+	*/
+		Bprintf("Failed to cancel scheduled shutdown\n");
+		exit(0);
+	}
+	pclose(fp);
+
+	/* Save  */
+	Bprintf("Saving...\n");
+	G_SavePlayer(INSTANT_PLAY_SAVESPOT);
+	Bprintf("Saved successfully!\n");
+
+	const char* prog_name = _buildargv[0];
+	Bprintf("prog_name is %s\n", prog_name);
+
+	char buf[256];
+	Bsprintf(buf, "%s 1> stdout.log 2> stderr.log", prog_name);
+
+	/* Perform Instant Play save and shutdown */
+	execlp(SHELL_CMD_INSTANT_PLAY, SHELL_CMD_INSTANT_PLAY,
+		"save", prog_name, "-instantplay", NULL);
+
+	/* Should not be reached */
+	Bprintf("Failed to perform Instant Play save and shutdown\n");
+
+	/* Exit Emulator */
+	exit(0);
+}
 
 //
 // handleevents() -- process the SDL message queue
@@ -1572,6 +1628,12 @@ int32_t handleevents(void)
 {
     int32_t code, rv=0, j;
     SDL_Event ev;
+
+	if (wantspoweroff)
+	{
+		quicksaveandpoweroff();
+		wantspoweroff = 0;
+	}
 
     while (SDL_PollEvent(&ev))
     {
