@@ -139,10 +139,26 @@ int32_t G_LoadPlayer(int32_t spot)
     strcpy(fn, "egam0.sav");
     strcpy(mpfn, "egamA_00.sav");
 
-    fnptr = fn;
-    fn[4] = spot + '0';
+	fnptr = fn;
 
-    if ((fil = kopen4loadfrommod(fnptr,0)) == -1) return(-1);
+	if (spot == INSTANT_PLAY_SAVESPOT)
+	{
+		strcpy(fn, "instant.sav");
+	}
+	else
+	{
+		fn[4] = spot + '0';
+	}
+
+	printf("Attempting to load %s\n", fn);
+
+	if ((fil = kopen4loadfrommod(fnptr, 0)) == -1)
+	{
+		printf("File load FAILED\n");
+		return(-1);
+	}
+
+	printf("File opened\n");
 
     ready2send = 0;
 
@@ -193,7 +209,15 @@ int32_t G_LoadPlayer(int32_t spot)
     }
     else
     {
-        if (kdfread(&ud.savegame[spot][0],21,1,fil) != 1) goto corrupt;
+		if (spot == INSTANT_PLAY_SAVESPOT)
+		{
+			char temp[22];
+			if (kdfread(&temp[0], 21, 1, fil) != 1) goto corrupt;
+		}
+		else
+		{
+			if (kdfread(&ud.savegame[spot][0],21,1,fil) != 1) goto corrupt;
+		}
         ud.savegame[spot][19] = 0;
     }
 
@@ -615,6 +639,7 @@ int32_t G_LoadPlayer(int32_t spot)
 
     return(0);
 corrupt:
+	printf("Corrupt!");
     Bsprintf(tempbuf,"Save game file \"%s\" is corrupt or of the wrong version.",fnptr);
     G_GameExit(tempbuf);
     return -1;
@@ -635,8 +660,16 @@ int32_t G_SavePlayer(int32_t spot)
 
     Net_WaitForServer();
 
-    fnptr = fn;
-    fn[4] = spot + '0';
+	fnptr = fn;
+
+	if (spot == INSTANT_PLAY_SAVESPOT)
+	{
+		strcpy(fn, "instant.sav");
+	}
+	else
+	{
+		fn[4] = spot + '0';
+	}
 
     {
         char temp[BMAX_PATH];
@@ -656,7 +689,18 @@ int32_t G_SavePlayer(int32_t spot)
     dfwrite(&bv,sizeof(bv),1,fil);
     dfwrite(&ud.multimode,sizeof(ud.multimode),1,fil);
 
-    dfwrite(&ud.savegame[spot][0],21,1,fil);
+	if (spot == INSTANT_PLAY_SAVESPOT)
+	{
+		char temp[22];
+		memset(temp, 0, 22);
+		strcpy(temp, "instant");
+		dfwrite(&temp[0], 21, 1, fil);
+	}
+	else
+	{
+		dfwrite(&ud.savegame[spot][0], 21, 1, fil);
+	}
+
     dfwrite(&ud.volume_number,sizeof(ud.volume_number),1,fil);
     dfwrite(&ud.level_number,sizeof(ud.level_number),1,fil);
     dfwrite(&ud.player_skill,sizeof(ud.player_skill),1,fil);
