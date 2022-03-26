@@ -1602,11 +1602,12 @@ void quicksaveandpoweroff()
 	G_SavePlayer(INSTANT_PLAY_SAVESPOT);
 	Bprintf("Saved successfully!\n");
 
+	Bprintf("Saving config...\n");
+	CONFIG_WriteSetup();
+	Bprintf("Config saved!\n");
+
 	const char* prog_name = _buildargv[0];
 	Bprintf("prog_name is %s\n", prog_name);
-
-	char buf[256];
-	Bsprintf(buf, "%s 1> stdout.log 2> stderr.log", prog_name);
 
 	/* Perform Instant Play save and shutdown */
 	execlp(SHELL_CMD_INSTANT_PLAY, SHELL_CMD_INSTANT_PLAY,
