@@ -524,7 +524,8 @@ int32_t G_LoadPlayer(int32_t spot)
         S_StopMusic();
         S_PlayMusic(&MapInfo[(uint8_t)g_musicIndex].musicfn[0],g_musicIndex);
     }
-    S_PauseMusic(0);
+
+	if (ud.config.MusicToggle) S_PauseMusic(0);
 
     g_player[myconnectindex].ps->gm = MODE_GAME;
     ud.recstat = 0;
