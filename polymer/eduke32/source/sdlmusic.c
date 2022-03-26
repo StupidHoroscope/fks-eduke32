@@ -86,7 +86,7 @@ void update_audio(char **ptr, uint32_t *length)
 
 	memset(buffer, 0, BUFFERSIZE);
 
-	if (_midi.status == MIDI_PLAYING)
+	if (_midi.status == MIDI_PLAYING && _midi.song)
 	{
 		*length = mid_song_read_wave(_midi.song, buffer, BUFFERSIZE);
 

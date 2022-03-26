@@ -10083,6 +10083,8 @@ MAIN_LOOP_RESTART:
 
 	if (g_loadInstantPlay)
 	{
+		g_musicIndex = -1; // We set an invalid music index so G_LoadPlayer will realise the music needs to be reset
+
 		printf("Loading instant play...\n");
 		if (G_LoadPlayer(INSTANT_PLAY_SAVESPOT) == 0)
 		{
