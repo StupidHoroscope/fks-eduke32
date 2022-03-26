@@ -1,6 +1,7 @@
 #!/bin/sh
 
 # Detect whether libvorbis libs are already there then copy them if not
+# (This is due to some OS versions missing the necessary files)
 if [ ! -f /usr/lib/libvorbis.so.0 ]; then
 	rw
 	cp -f libvorbis.so.0 /usr/lib
@@ -9,8 +10,6 @@ if [ ! -f /usr/lib/libvorbis.so.0 ]; then
 	pid record $!
 	wait $!
 	pid erase
-	rm -f /usr/lib/libvorbis.so.0
-	rm -f /usr/lib/libvorbisfile.so.3
 	ro
 else
 	./eduke32 &
