@@ -33,519 +33,290 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "cache1d.h"
 
 #define _NEED_SDLMIXER	1
-#include "sdl_inc.h"
+//#include "sdl_inc.h"
+//#include "fluidsynth_inc.h"
+#include "midi.h"
 #include "music.h"
 
-#if !defined _WIN32  // fork/exec based external midi player
-#include <stdlib.h>
-#include <signal.h>
-#include <unistd.h>
-#include <sys/mman.h>
-#include <sys/wait.h>
-static char **external_midi_argv;
-static pid_t external_midi_pid=-1;
-static int8_t external_midi_restart=0;
-#endif
-static char *external_midi_tempfn = "/tmp/eduke32-music.mid";
-static int32_t external_midi = 0;
+#include "timidity.h"
+#include "timidity_internal.h"
+#include "jaudiolib/src/multivoc.h"
+#include "jaudiolib/src/_multivc.h"
+
+enum MidiState 
+{
+	MIDI_STOPPED = 0,
+	MIDI_PLAYING = 1,
+};
+
+static struct {
+	MidIStream *stream;
+	MidSongOptions options;
+	MidSong *song;
+
+	int status;
+	int looping;
+	uint32 song_length;
+	uint32 song_position;
+} _midi; ///< Metadata about the midi we're playing.
 
 int32_t MUSIC_ErrorCode = MUSIC_Ok;
-
-static char warningMessage[80];
-static char errorMessage[80];
-
 static int32_t music_initialized = 0;
-static int32_t music_context = 0;
-static int32_t music_loopflag = MUSIC_PlayOnce;
-static Mix_Music *music_musicchunk = NULL;
+int32_t music_handle = 0;
+int32_t MusicMaxVolume = 255;
 
-static void setErrorMessage(const char *msg)
-{
-    Bstrncpy(errorMessage, msg, sizeof(errorMessage));
-    // strncpy() doesn't add the null char if there isn't room...
-    errorMessage[sizeof(errorMessage) - 1] = '\0';
-} // setErrorMessage
-
-// The music functions...
+static int16_t MusicVolumeTable[255 + 1][256];
 
 char *MUSIC_ErrorString(int32_t ErrorNumber)
 {
-    switch (ErrorNumber)
-    {
-    case MUSIC_Warning:
-        return(warningMessage);
+	switch (ErrorNumber)
+	{
+	default:
+		return "Unknown error.";
+	}
 
-    case MUSIC_Error:
-        return(errorMessage);
+	return NULL;
+}
 
-    case MUSIC_Ok:
-        return("OK; no error.");
+#define BUFFERSIZE 2048
+void update_audio(char **ptr, uint32_t *length)
+{
+	static char buffer[BUFFERSIZE];
+	*ptr = buffer;
 
-    case MUSIC_ASSVersion:
-        return("Incorrect sound library version.");
+	memset(buffer, 0, BUFFERSIZE);
 
-    case MUSIC_SoundCardError:
-        return("General sound card error.");
+	if (_midi.status == MIDI_PLAYING)
+	{
+		*length = mid_song_read_wave(_midi.song, buffer, BUFFERSIZE);
 
-    case MUSIC_InvalidCard:
-        return("Invalid sound card.");
-
-    case MUSIC_MidiError:
-        return("MIDI error.");
-
-    case MUSIC_MPU401Error:
-        return("MPU401 error.");
-
-    case MUSIC_TaskManError:
-        return("Task Manager error.");
-
-        //case MUSIC_FMNotDetected:
-        //    return("FM not detected error.");
-
-    case MUSIC_DPMI_Error:
-        return("DPMI error.");
-
-    default:
-        return("Unknown error.");
-    } // switch
-
-    return(NULL);
-} // MUSIC_ErrorString
+		// If the song has finished, loop it
+		if (*length < BUFFERSIZE && _midi.looping == MUSIC_LoopSong && _midi.song->current_sample >= _midi.song->samples)
+		{
+			int remainder = BUFFERSIZE - *length;
+			mid_song_start(_midi.song);
+			*length += mid_song_read_wave(_midi.song, buffer + *length, remainder);
+		}
+	}
+	else
+	{
+		*length = 0;
+	}
+}
 
 int32_t MUSIC_Init(int32_t SoundCard, int32_t Address)
 {
-    // Use an external MIDI player if the user has specified to do so
-    char *command = getenv("EDUKE32_MUSIC_CMD");
-    const SDL_version *linked = Mix_Linked_Version();
+	if (getenv("EDUKE32_MUSIC_CMD")) {
+		initprintf("External MIDI player not supported by Timidity backend");
+	}
 
-    if (music_initialized)
-    {
-        setErrorMessage("Music system is already initialized.");
-        return(MUSIC_Error);
-    } // if
+	if (music_initialized) 
+	{
+		printf("Music already intialized!");
+		return MUSIC_Ok;
+	}
+	
+	// Figure out if any of the timidity files exist
+	static const char* configFiles[] = { "/opk/timidity.cfg", "/mnt/FunKey/.eduke32/timidity.cfg" };
 
-    UNREFERENCED_PARAMETER(Address);
-    if (SDL_VERSIONNUM(linked->major,linked->minor,linked->patch) < MIX_REQUIREDVERSION)
-    {
-        // reject running with SDL_Mixer versions older than what is stated in sdl_inc.h
-        initprintf("You need at least v%d.%d.%d of SDL_mixer for music\n",SDL_MIXER_MIN_X,SDL_MIXER_MIN_Y,SDL_MIXER_MIN_Z);
-        return(MUSIC_Error);
-    }
+	FILE *fp;
+	int32_t i;
 
-    external_midi = (command != NULL && command[0] != 0);
+	for (i = (sizeof(configFiles) / sizeof(configFiles[0])) - 1; i >= 0; i--)
+	{
+		fp = Bfopen(configFiles[i], "r");
+		if (fp == NULL)
+		{
+			if (i == 0)
+			{
+				printf("Error: couldn't open any of the following files:\n");
+				for (i = (sizeof(configFiles) / sizeof(configFiles[0])) - 1; i >= 0; i--)
+				{
+					initprintf("%s\n", configFiles[i]);
+				}
 
-    if (external_midi)
-    {
-        initprintf("Setting music command to \"%s\".\n", command);
+				return(MUSIC_Error);
+			}
+			continue;
+		}
+		else
+		{
+			printf("Using Timidity config file: %s\n", configFiles[i]);
+			break;
+		}
+	}
+	Bfclose(fp);
 
-#if defined _WIN32
-        if (Mix_SetMusicCMD(command)==-1)
-        {
-            perror("Mix_SetMusicCMD");
-            goto fallback;
-        }
-#else
-        int32_t ws=1, numargs=0, pagesize=sysconf(_SC_PAGE_SIZE);
-        char *c, *cmd;
-        size_t sz;
+	int result = mid_init(configFiles[i]);
+	if (result < 0)
+	{
+		printf("Error initializing Timidity: %d\n", result);
+		return MUSIC_Error;
+	}
 
-        if (pagesize==-1)
-            goto fallback;
+	_midi.status = MIDI_STOPPED;
+	_midi.song = NULL;
+	_midi.looping = 0;
 
-        for (c=command; *c; c++)
-        {
-            if (isspace(*c))
-                ws = 1;
-            else if (ws)
-            {
-                ws = 0;
-                numargs++;
-            }
-        }
+	_midi.options.rate = ud.config.MixRate;
+	_midi.options.format = MID_AUDIO_U8;
+	_midi.options.channels = 1;
+	_midi.options.width = ud.config.NumBits == 16 ? 2 : 1;
+	_midi.options.buffer_size = _midi.options.rate;
 
-        if (numargs==0)
-            goto fallback;
+	music_handle = FX_StartDemandFeedPlayback(update_audio, ud.config.MixRate, 0, 255, 255, 255, FX_MUSIC_PRIORITY, 0);
+	if (music_handle == FX_Warning)
+	{
+		printf("FX_StartDemandFeedPlayback failed\n");
+		return MUSIC_Error;
+	}
 
-        sz = (numargs+2)*sizeof(char *) + (c-command+1);
-        sz = ((sz+pagesize-1)/pagesize)*pagesize;
+	MUSIC_SetVolume(ud.config.MusicVolume);
 
-        external_midi_argv = Bmemalign(pagesize, sz);
-        if (!external_midi_argv)
-            goto fallback;
+	// HACK: We're using an MV_Voice to render the music to, which are affected by the SFX Volume. We want to keep music volume independent from the SFX,
+	// so I've duplicated the code from MV_SetVoiceVolume and MV_GetVolumeTable.
+	VoiceNode* voice = MV_GetVoice(music_handle);
+	if (voice)
+	{
+		int32_t volume = MIX_VOLUME(MusicMaxVolume);
+		int16_t *table = (int16_t *)&MusicVolumeTable[volume];
 
-        cmd = (char *)external_midi_argv + (numargs+2)*sizeof(char *);
-        Bmemcpy(cmd, command, c-command+1);
+		voice->LeftVolume = table;
+		voice->RightVolume = table;
 
-        ws = 1;
-        numargs = 0;
-        for (c=cmd; *c; c++)
-        {
-            if (isspace(*c))
-            {
-                ws = 1;
-                *c = 0;
-            }
-            else if (ws)
-            {
-                ws = 0;
-                external_midi_argv[numargs++] = c;
-            }
-        }
-        external_midi_argv[numargs] = external_midi_tempfn;
-        external_midi_argv[numargs+1] = NULL;
+		MV_SetVoiceMixMode(voice);
+	}
 
-        if (mprotect(external_midi_argv, sz, PROT_READ)==-1)  // make argv and command string read-only
-        {
-            perror("MUSIC_Init: mprotect");
-            goto fallback;
-        }
-        /*
-                {
-                    int i;
-                    initprintf("----Music argv:\n");
-                    for (i=0; i<numargs+1; i++)
-                        initprintf("  %s\n", external_midi_argv[i]);
-                    initprintf("----\n");
-                }
-        */
-#endif
-        SoundCard = 1;
-        music_initialized = 1;
-        return(MUSIC_Ok);
+	MUSIC_SetLoopFlag(MUSIC_LoopSong); // Loop by default
 
-fallback:
-        initprintf("Error setting music command, falling back to timidity.\n");
-    }
+	music_initialized = 1;
 
-    {
-        static char *s[] = { "/etc/timidity.cfg", "/etc/timidity/timidity.cfg", "/etc/timidity/freepats.cfg" };
-        FILE *fp;
-        int32_t i;
+	return MUSIC_Ok;
+}
 
-        for (i = (sizeof(s)/sizeof(s[0]))-1; i>=0; i--)
-        {
-            fp = Bfopen(s[i], "r");
-            if (fp == NULL)
-            {
-                if (i == 0)
-                {
-                    initprintf("Error: couldn't open any of the following files:\n");
-                    for (i = (sizeof(s)/sizeof(s[0]))-1; i>=0; i--)
-                        initprintf("%s\n",s[i]);
-                    return(MUSIC_Error);
-                }
-                continue;
-            }
-            else break;
-        }
-        Bfclose(fp);
-    }
-
-    SoundCard = 1;
-    music_initialized = 1;
-    return(MUSIC_Ok);
-} // MUSIC_Init
-
+void MUSIC_CalcVolume(int32_t MaxVolume)
+{
+	// For each volume level, create a translation table with the
+	// appropriate volume calculated.
+	for (int32_t volume = 0; volume <= MV_MaxVolume; volume++)
+	{
+		MV_CreateVolumeTable(volume, volume, MaxVolume, MusicVolumeTable);
+	}
+}
 
 int32_t MUSIC_Shutdown(void)
 {
-    // TODO - make sure this is being called from the menu -- SA
-#if defined _WIN32
-    if (external_midi)
-        Mix_SetMusicCMD(NULL);
-#endif
+	if (music_initialized)
+	{
+		if (music_handle > 0)
+		{
+			FX_StopSound(music_handle);
+			music_handle = 0;
+		}
 
-    MUSIC_StopSong();
-    music_context = 0;
-    music_initialized = 0;
-    music_loopflag = MUSIC_PlayOnce;
+		printf("Shutting down Timidity\n");
+		mid_exit();
 
-    return(MUSIC_Ok);
-} // MUSIC_Shutdown
+		music_initialized = 0;
+	}
 
-
-void MUSIC_SetMaxFMMidiChannel(int32_t channel)
-{
-    UNREFERENCED_PARAMETER(channel);
-} // MUSIC_SetMaxFMMidiChannel
-
+	return MUSIC_Ok;
+}
 
 void MUSIC_SetVolume(int32_t volume)
 {
-    volume = max(0, volume);
-    volume = min(volume, 255);
+	volume = max(0, volume);
+	volume = min(volume, MV_MaxTotalVolume);
 
-    Mix_VolumeMusic(volume >> 1);  // convert 0-255 to 0-128.
-} // MUSIC_SetVolume
+	MusicMaxVolume = volume;
 
-
-void MUSIC_SetMidiChannelVolume(int32_t channel, int32_t volume)
-{
-    UNREFERENCED_PARAMETER(channel);
-    UNREFERENCED_PARAMETER(volume);
-} // MUSIC_SetMidiChannelVolume
-
-
-void MUSIC_ResetMidiChannelVolumes(void)
-{
-} // MUSIC_ResetMidiChannelVolumes
-
+	MUSIC_CalcVolume(volume);
+}
 
 int32_t MUSIC_GetVolume(void)
 {
-    return(Mix_VolumeMusic(-1) << 1);  // convert 0-128 to 0-255.
-} // MUSIC_GetVolume
-
+	return MusicMaxVolume;
+}
 
 void MUSIC_SetLoopFlag(int32_t loopflag)
 {
-    music_loopflag = loopflag;
-} // MUSIC_SetLoopFlag
-
-
-int32_t MUSIC_SongPlaying(void)
-{
-    return((Mix_PlayingMusic()) ? TRUE : FALSE);
-} // MUSIC_SongPlaying
-
+	_midi.looping = loopflag;
+}
 
 void MUSIC_Continue(void)
 {
-    if (Mix_PausedMusic())
-        Mix_ResumeMusic();
-} // MUSIC_Continue
-
+	if (music_handle > 0)
+	{
+		FX_PauseVoice(music_handle, 0);
+		_midi.status = MIDI_PLAYING;
+	}
+}
 
 void MUSIC_Pause(void)
 {
-    Mix_PauseMusic();
-} // MUSIC_Pause
+	if (music_handle > 0)
+	{
+		FX_PauseVoice(music_handle, 1);
+		_midi.status = MIDI_STOPPED;
+	}
+}
 
 int32_t MUSIC_StopSong(void)
 {
-#if !defined _WIN32
-    if (external_midi)
-    {
-        if (external_midi_pid > 0)
-        {
-            int32_t ret;
+	if (!music_initialized)
+	{
+		return MUSIC_Error;
+	}
 
-            external_midi_restart = 0;  // make SIGCHLD handler a no-op
-
-            kill(external_midi_pid, SIGTERM);
-            nanosleep(&(const struct timespec) { .tv_sec=0, .tv_nsec=5000000 }, NULL); // sleep 5ms at most
-            ret = waitpid(external_midi_pid, NULL, WNOHANG|WUNTRACED);
-//            printf("(%d)", ret);
-
-            if (ret != external_midi_pid)
-            {
-                if (ret==-1)
-                    perror("waitpid");
-                else
-                {
-                    // we tried to be nice, but no...
-                    kill(external_midi_pid, SIGKILL);
-                    initprintf("%s: wait for SIGTERM timed out.\n", __func__);
-                    if (waitpid(external_midi_pid, NULL, WUNTRACED)==-1)
-                        perror("waitpid (2)");
-                }
-            }
-
-            external_midi_pid = -1;
-        }
-
-        return(MUSIC_Ok);
-    }
-#endif
-
-    //if (!fx_initialized)
-    if (!Mix_QuerySpec(NULL, NULL, NULL))
-    {
-        setErrorMessage("Need FX system initialized, too. Sorry.");
-        return(MUSIC_Error);
-    } // if
-
-    if ((Mix_PlayingMusic()) || (Mix_PausedMusic()))
-        Mix_HaltMusic();
-
-    if (music_musicchunk)
-        Mix_FreeMusic(music_musicchunk);
-
-    music_musicchunk = NULL;
-
-    return(MUSIC_Ok);
-} // MUSIC_StopSong
-
-#if !defined _WIN32
-static void playmusic()
-{
-    pid_t pid = vfork();
-
-    if (pid==-1)  // error
-    {
-        initprintf("%s: vfork: %s\n", __func__, strerror(errno));
-    }
-    else if (pid==0)  // child
-    {
-        // exec with PATH lookup
-        if (execvp(external_midi_argv[0], external_midi_argv) < 0)
-        {
-            perror("execv");
-            _exit(1);
-        }
-    }
-    else  // parent
-    {
-        external_midi_pid = pid;
-    }
+	MUSIC_Pause();
+	
+	if (_midi.song != NULL)
+	{
+		mid_song_free(_midi.song);
+		_midi.song = NULL;
+	}
+	
+	return MUSIC_Ok;
 }
 
-static void sigchld_handler(int signo)
-{
-    if (signo==SIGCHLD && external_midi_restart)
-    {
-        int status;
-
-        if (waitpid(external_midi_pid, &status, WUNTRACED)==-1)
-            perror("waitpid (3)");
-
-        if (WIFEXITED(status) && WEXITSTATUS(status)==0)
-        {
-            // loop ...
-            playmusic();
-        }
-    }
-}
-#endif
-
-// Duke3D-specific.  --ryan.
-// void MUSIC_PlayMusic(char *_filename)
 int32_t MUSIC_PlaySong(char *song, int32_t loopflag)
 {
-    MUSIC_StopSong();
+	if (!music_initialized)
+	{
+		return MUSIC_Error;
+	}
 
-    if (external_midi)
-    {
-        FILE *fp;
+	MUSIC_StopSong();
 
-#if !defined _WIN32
-        static int32_t sigchld_handler_set = 0;
+	_midi.stream = mid_istream_open_mem(song, g_musicSize, 0);
+	if (_midi.stream == NULL) 
+	{
+		printf("Could not open music data");
+		return MUSIC_Error;
+	}
 
-        if (!sigchld_handler_set)
-        {
-            struct sigaction sa = { .sa_handler=sigchld_handler, .sa_flags=0 };
-            sigemptyset(&sa.sa_mask);
+	_midi.song = mid_song_load(_midi.stream, &_midi.options);
+	mid_istream_close(_midi.stream);
+	_midi.song_length = mid_song_get_total_time(_midi.song);
 
-            if (sigaction(SIGCHLD, &sa, NULL)==-1)
-                initprintf("%s: sigaction: %s\n", __func__, strerror(errno));
+	if (_midi.song == NULL) 
+	{
+		printf("Invalid MIDI file");
+		return MUSIC_Error;
+	}
 
-            sigchld_handler_set = 1;
-        }
-#endif
+	mid_song_start(_midi.song);
+	MUSIC_Continue();
 
-        fp = Bfopen(external_midi_tempfn, "wb");
-        if (fp)
-        {
-            fwrite(song, 1, g_musicSize, fp);
-            Bfclose(fp);
-
-#if !defined _WIN32
-            external_midi_restart = loopflag;
-            playmusic();
-#else
-            music_musicchunk = Mix_LoadMUS(external_midi_tempfn);
-            if (!music_musicchunk)
-                initprintf("Mix_LoadMUS: %s\n", Mix_GetError());
-#endif
-        }
-        else initprintf("%s: fopen: %s\n", __func__, strerror(errno));
-    }
-    else
-        music_musicchunk = Mix_LoadMUS_RW(SDL_RWFromMem((char *) song, g_musicSize));
-
-    if (music_musicchunk != NULL)
-        if (Mix_PlayMusic(music_musicchunk, (loopflag == MUSIC_LoopSong)?-1:0) == -1)
-            initprintf("Mix_PlayMusic: %s\n", Mix_GetError());
-
-    return MUSIC_Ok;
+	return MUSIC_Ok;
 }
 
-
-void MUSIC_SetContext(int32_t context)
+int32_t MUSIC_InitMidi(int32_t card, midifuncs *Funcs, int32_t Address)
 {
-    music_context = context;
-} // MUSIC_SetContext
+	return MIDI_Ok;
+}
 
-
-int32_t MUSIC_GetContext(void)
+void MUSIC_Update(void) 
 {
-    return(music_context);
-} // MUSIC_GetContext
 
-
-void MUSIC_SetSongTick(uint32_t PositionInTicks)
-{
-    UNREFERENCED_PARAMETER(PositionInTicks);
-} // MUSIC_SetSongTick
-
-
-void MUSIC_SetSongTime(uint32_t milliseconds)
-{
-    UNREFERENCED_PARAMETER(milliseconds);
-}// MUSIC_SetSongTime
-
-
-void MUSIC_SetSongPosition(int32_t measure, int32_t beat, int32_t tick)
-{
-    UNREFERENCED_PARAMETER(measure);
-    UNREFERENCED_PARAMETER(beat);
-    UNREFERENCED_PARAMETER(tick);
-} // MUSIC_SetSongPosition
-
-
-void MUSIC_GetSongPosition(songposition *pos)
-{
-    UNREFERENCED_PARAMETER(pos);
-} // MUSIC_GetSongPosition
-
-
-void MUSIC_GetSongLength(songposition *pos)
-{
-    UNREFERENCED_PARAMETER(pos);
-} // MUSIC_GetSongLength
-
-
-int32_t MUSIC_FadeVolume(int32_t tovolume, int32_t milliseconds)
-{
-    UNREFERENCED_PARAMETER(tovolume);
-    Mix_FadeOutMusic(milliseconds);
-    return(MUSIC_Ok);
-} // MUSIC_FadeVolume
-
-
-int32_t MUSIC_FadeActive(void)
-{
-    return((Mix_FadingMusic() == MIX_FADING_OUT) ? TRUE : FALSE);
-} // MUSIC_FadeActive
-
-
-void MUSIC_StopFade(void)
-{
-} // MUSIC_StopFade
-
-
-void MUSIC_RerouteMidiChannel(int32_t channel, int32_t (*function)(int32_t, int32_t, int32_t))
-{
-    UNREFERENCED_PARAMETER(channel);
-    UNREFERENCED_PARAMETER(function);
-} // MUSIC_RerouteMidiChannel
-
-
-void MUSIC_RegisterTimbreBank(char *timbres)
-{
-    UNREFERENCED_PARAMETER(timbres);
-} // MUSIC_RegisterTimbreBank
-
-
-void MUSIC_Update(void)
-{}
+}

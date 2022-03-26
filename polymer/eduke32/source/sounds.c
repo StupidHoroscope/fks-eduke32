@@ -122,7 +122,7 @@ void S_MusicShutdown(void)
     if (ud.config.MusicDevice < 0)
         return;
 
-    S_StopMusic();
+	S_StopMusic();
 
     if (MUSIC_Shutdown() != MUSIC_Ok)
         initprintf(MUSIC_ErrorString(MUSIC_ErrorCode));
@@ -130,18 +130,20 @@ void S_MusicShutdown(void)
 
 void S_PauseMusic(int32_t onf)
 {
-    if (MusicPaused == onf || (MusicIsWaveform && MusicVoice < 0))
-        return;
+	if (/*MusicPaused == onf || */(MusicIsWaveform && MusicVoice < 0))
+	{
+		return;
+	}
 
-    MusicPaused = onf;
+	MusicPaused = onf;
 
     if (MusicIsWaveform)
     {
-        FX_PauseVoice(MusicVoice, onf);
+		FX_PauseVoice(MusicVoice, onf);
         return;
     }
 
-    if (onf)
+	if (onf)
         MUSIC_Pause();
     else
         MUSIC_Continue();
@@ -245,7 +247,13 @@ int32_t S_PlayMusic(const char *fn, const int32_t sel)
 
     if (!Bmemcmp(MusicPtr, "MThd", 4))
     {
-        MUSIC_PlaySong(MusicPtr, MUSIC_LoopSong);
+		printf("Trying to play music: %s\n", fn);
+		if (MUSIC_PlaySong(MusicPtr, MUSIC_LoopSong) == 0)
+		{
+			MUSIC_Continue();
+			printf("Playing music: %s\n", fn);
+		}
+
         MusicIsWaveform = 0;
     }
     else
@@ -260,8 +268,6 @@ int32_t S_PlayMusic(const char *fn, const int32_t sel)
 
 void S_StopMusic(void)
 {
-    MusicPaused = 0;
-
     if (MusicIsWaveform && MusicVoice >= 0)
     {
         FX_StopSound(MusicVoice);
@@ -269,7 +275,7 @@ void S_StopMusic(void)
         MusicIsWaveform = 0;
     }
 
-    MUSIC_StopSong();
+	MUSIC_StopSong();
 
     if (MusicPtr)
     {

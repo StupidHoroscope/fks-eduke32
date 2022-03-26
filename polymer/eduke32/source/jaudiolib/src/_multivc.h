@@ -229,7 +229,10 @@ typedef char HARSH_CLIP_TABLE_8[ MV_NumVoices * 256 ];
 #define MV_SetErrorCode( status ) \
    MV_ErrorCode   = ( status );
 
+VoiceNode *MV_GetVoice(int32_t handle);
 void MV_PlayVoice( VoiceNode *voice );
+
+int16_t *MV_GetVolumeTable(int32_t vol);
 
 VoiceNode *MV_AllocVoice( int32_t priority );
 

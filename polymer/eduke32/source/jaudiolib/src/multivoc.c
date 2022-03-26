@@ -62,9 +62,9 @@ static playbackstatus MV_GetNextDemandFeedBlock( VoiceNode *voice );
 static playbackstatus MV_GetNextRawBlock( VoiceNode *voice );
 static playbackstatus MV_GetNextWAVBlock( VoiceNode *voice );
 
-static VoiceNode *MV_GetVoice( int32_t handle );
+//static VoiceNode *MV_GetVoice( int32_t handle );
 
-static int16_t     *MV_GetVolumeTable( int32_t vol );
+//static int16_t     *MV_GetVolumeTable( int32_t vol );
 
 static void       MV_SetVoicePitch( VoiceNode *voice, uint32_t rate, int32_t pitchoffset );
 static void       MV_CalcVolume( int32_t MaxLevel );
@@ -1184,7 +1184,7 @@ int32_t MV_SetFrequency
    volume.
 ---------------------------------------------------------------------*/
 
-static int16_t *MV_GetVolumeTable
+int16_t *MV_GetVolumeTable
 (
     int32_t vol
 )
@@ -1844,6 +1844,7 @@ int32_t MV_StartDemandFeedPlayback
 
     if (!MV_Installed)
     {
+		printf("Not installed!\n");
         MV_SetErrorCode(MV_NotInstalled);
         return(MV_Error);
     }
@@ -2369,7 +2370,8 @@ void MV_CreateVolumeTable
 (
     int32_t index,
     int32_t volume,
-    int32_t MaxVolume
+    int32_t MaxVolume,
+	int16_t (*volumeTable)[256]
 )
 
 {
@@ -2385,7 +2387,7 @@ void MV_CreateVolumeTable
             val   = i - 0x8000;
             val  *= level;
             val  /= MV_MaxVolume;
-            MV_VolumeTable[ index ][ i / 256 ] = val;
+			volumeTable[ index ][ i / 256 ] = val;
         }
     }
     else
@@ -2395,7 +2397,7 @@ void MV_CreateVolumeTable
             val   = i - 0x80;
             val  *= level;
             val  /= MV_MaxVolume;
-            MV_VolumeTable[ volume ][ i ] = val;
+			volumeTable[ volume ][ i ] = val;
         }
     }
 }
@@ -2430,7 +2432,7 @@ void MV_CalcVolume
     // appropriate volume calculated.
     for (volume = 0; volume <= MV_MaxVolume; volume++)
     {
-        MV_CreateVolumeTable(volume, volume, MaxVolume);
+        MV_CreateVolumeTable(volume, volume, MaxVolume, MV_VolumeTable);
     }
 }
 

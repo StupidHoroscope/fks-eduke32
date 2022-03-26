@@ -8800,7 +8800,7 @@ static void G_DisplayLogo(void)
     Bsprintf(tempbuf, "%s - " APPNAME, g_gameNamePtr);
     wm_setapptitle(tempbuf);
 
-    S_StopMusic();
+	S_StopMusic();
     FX_StopAllSounds(); // JBF 20031228
     S_ClearSoundLocks();  // JBF 20031228
     if ((!g_netServer && ud.multimode < 2) && (logoflags & LOGO_ENABLED) && !g_noLogo)
@@ -9014,8 +9014,8 @@ static void G_Cleanup(void)
 void G_Shutdown(void)
 {
     CONFIG_WriteSetup();
-    S_SoundShutdown();
     S_MusicShutdown();
+    S_SoundShutdown();
     CONTROL_Shutdown();
     KB_Shutdown();
     uninitengine();
@@ -10053,8 +10053,8 @@ CLEAN_DIRECTORY:
 
     setbrightness(ud.brightness>>2,&g_player[myconnectindex].ps->palette[0],0);
 
-    S_MusicStartup();
     S_SoundStartup();
+    S_MusicStartup();
 //    loadtmb();
 
     if (ud.warp_on > 1 && (!g_netServer && ud.multimode < 2))
@@ -10668,12 +10668,12 @@ void G_BonusScreen(int32_t bonusonly)
                 Net_GetPackets();
             }
             fadepal(0,0,0, 0,64,1);
-            S_StopMusic();
+			S_StopMusic();
             FX_StopAllSounds();
             S_ClearSoundLocks();
             break;
         case 1:
-            S_StopMusic();
+			S_StopMusic();
             clearview(0L);
             nextpage();
 
@@ -10707,7 +10707,7 @@ void G_BonusScreen(int32_t bonusonly)
 
             setview(0,0,xdim-1,ydim-1);
 
-            S_StopMusic();
+			S_StopMusic();
             clearview(0L);
             nextpage();
 
@@ -10776,7 +10776,7 @@ void G_BonusScreen(int32_t bonusonly)
 
         case 2:
 
-            S_StopMusic();
+			S_StopMusic();
             clearview(0L);
             nextpage();
             if (ud.lockout == 0)
@@ -10868,7 +10868,7 @@ FRAGBONUS:
     tinc = 0;
     bonuscnt = 0;
 
-    S_StopMusic();
+	S_StopMusic();
     FX_StopAllSounds();
     S_ClearSoundLocks();
 

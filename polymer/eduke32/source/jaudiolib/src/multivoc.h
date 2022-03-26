@@ -109,7 +109,7 @@ int32_t   MV_PlayVorbis( char *ptr, uint32_t length, int32_t pitchoffset, int32_
 int32_t   MV_PlayLoopedVorbis( char *ptr, uint32_t length, int32_t loopstart, int32_t loopend,
                         int32_t pitchoffset, int32_t vol, int32_t left, int32_t right, int32_t priority,
                         uint32_t callbackval );
-void  MV_CreateVolumeTable( int32_t index, int32_t volume, int32_t MaxVolume );
+void  MV_CreateVolumeTable( int32_t index, int32_t volume, int32_t MaxVolume, int16_t (*volumeTable)[256]);
 void  MV_SetVolume( int32_t volume );
 int32_t   MV_GetVolume( void );
 void  MV_SetCallBack( void ( *function )( uint32_t ) );

@@ -5,7 +5,7 @@ if [ ! -f /usr/lib/libvorbis.so.0 ]; then
 	rw
 	cp -f libvorbis.so.0 /usr/lib
 	cp -f libvorbisfile.so.3 /usr/lib
-	./eduke32
+	./eduke32 &
 	pid record $!
 	wait $!
 	pid erase
@@ -14,7 +14,6 @@ if [ ! -f /usr/lib/libvorbis.so.0 ]; then
 	ro
 else
 	./eduke32 &
-#	./eduke32 -instantplay &> /mnt/FunKey/.eduke32/stdout.log	
 	pid record $!
 	wait $!
 	pid erase

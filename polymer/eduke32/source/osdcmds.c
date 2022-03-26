@@ -335,11 +335,11 @@ static int32_t osdcmd_noclip(const osdfuncparm_t *parm)
 static int32_t osdcmd_restartsound(const osdfuncparm_t *parm)
 {
     UNREFERENCED_PARAMETER(parm);
-    S_SoundShutdown();
     S_MusicShutdown();
+    S_SoundShutdown();
 
-    S_MusicStartup();
     S_SoundStartup();
+    S_MusicStartup();
 
     FX_StopAllSounds();
     S_ClearSoundLocks();

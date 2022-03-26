@@ -49,6 +49,9 @@
     <Filter Include="jmact\source">
       <UniqueIdentifier>{8a6aad55-a3bc-4e4f-a61d-4652c29d8b92}</UniqueIdentifier>
     </Filter>
+    <Filter Include="timidity">
+      <UniqueIdentifier>{22b63bc7-42d9-4680-af3e-80036e629dbd}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="build\include\a.h">
@@ -354,6 +357,57 @@
     <ClInclude Include="source\demo.h">
       <Filter>eduke32\headers</Filter>
     </ClInclude>
+    <ClInclude Include="source\DebugHelperLog.h">
+      <Filter>eduke32\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="source\timidity\dls1.h">
+      <Filter>timidity</Filter>
+    </ClInclude>
+    <ClInclude Include="source\timidity\dls2.h">
+      <Filter>timidity</Filter>
+    </ClInclude>
+    <ClInclude Include="source\timidity\filenames.h">
+      <Filter>timidity</Filter>
+    </ClInclude>
+    <ClInclude Include="source\timidity\instrum.h">
+      <Filter>timidity</Filter>
+    </ClInclude>
+    <ClInclude Include="source\timidity\instrum_dls.h">
+      <Filter>timidity</Filter>
+    </ClInclude>
+    <ClInclude Include="source\timidity\mix.h">
+      <Filter>timidity</Filter>
+    </ClInclude>
+    <ClInclude Include="source\timidity\options.h">
+      <Filter>timidity</Filter>
+    </ClInclude>
+    <ClInclude Include="source\timidity\output.h">
+      <Filter>timidity</Filter>
+    </ClInclude>
+    <ClInclude Include="source\timidity\playmidi.h">
+      <Filter>timidity</Filter>
+    </ClInclude>
+    <ClInclude Include="source\timidity\readmidi.h">
+      <Filter>timidity</Filter>
+    </ClInclude>
+    <ClInclude Include="source\timidity\resample.h">
+      <Filter>timidity</Filter>
+    </ClInclude>
+    <ClInclude Include="source\timidity\tables.h">
+      <Filter>timidity</Filter>
+    </ClInclude>
+    <ClInclude Include="source\timidity\timi_endian.h">
+      <Filter>timidity</Filter>
+    </ClInclude>
+    <ClInclude Include="source\timidity\timidity.h">
+      <Filter>timidity</Filter>
+    </ClInclude>
+    <ClInclude Include="source\timidity\timidity_internal.h">
+      <Filter>timidity</Filter>
+    </ClInclude>
+    <ClInclude Include="source\timidity\common.h">
+      <Filter>timidity</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="build\src\a-c.c">
@@ -637,6 +691,39 @@
     </ClCompile>
     <ClCompile Include="source\demo.c">
       <Filter>eduke32\source</Filter>
+    </ClCompile>
+    <ClCompile Include="source\timidity\common.c">
+      <Filter>timidity</Filter>
+    </ClCompile>
+    <ClCompile Include="source\timidity\instrum.c">
+      <Filter>timidity</Filter>
+    </ClCompile>
+    <ClCompile Include="source\timidity\instrum_dls.c">
+      <Filter>timidity</Filter>
+    </ClCompile>
+    <ClCompile Include="source\timidity\mix.c">
+      <Filter>timidity</Filter>
+    </ClCompile>
+    <ClCompile Include="source\timidity\output.c">
+      <Filter>timidity</Filter>
+    </ClCompile>
+    <ClCompile Include="source\timidity\playmidi.c">
+      <Filter>timidity</Filter>
+    </ClCompile>
+    <ClCompile Include="source\timidity\readmidi.c">
+      <Filter>timidity</Filter>
+    </ClCompile>
+    <ClCompile Include="source\timidity\resample.c">
+      <Filter>timidity</Filter>
+    </ClCompile>
+    <ClCompile Include="source\timidity\stream.c">
+      <Filter>timidity</Filter>
+    </ClCompile>
+    <ClCompile Include="source\timidity\tables.c">
+      <Filter>timidity</Filter>
+    </ClCompile>
+    <ClCompile Include="source\timidity\timidity.c">
+      <Filter>timidity</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

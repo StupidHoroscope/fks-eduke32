@@ -4640,11 +4640,11 @@ cheat_for_port_credits:
                     if (!enabled) break;
                     if (x == io)
                     {
-                        S_SoundShutdown();
                         S_MusicShutdown();
+                        S_SoundShutdown();
 
-                        S_MusicStartup();
                         S_SoundStartup();
+                        S_MusicStartup();
 
                         FX_StopAllSounds();
                         S_ClearSoundLocks();

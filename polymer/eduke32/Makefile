@@ -71,6 +71,9 @@ JAUDIOLIB=libjfaudiolib.a
 ENETDIR=$(SRC)/enet
 ENETLIB=libenet.a
 
+TIMIDITYLIBDIR=$(SRC)/timidity
+TIMIDITYLIB=libtimidity.a
+
 CHAINPREFIX ?= /opt/FunKey-sdk-2.3.0
 CROSS_COMPILE ?= $(CHAINPREFIX)/bin/arm-funkey-linux-musleabihf-
 
@@ -91,7 +94,7 @@ SDL_FRAMEWORK=/opt/FunKey-sdk-2.3.0/arm-funkey-linux-musleabihf/sysroot/usr/incl
 
 OURCFLAGS=$(debug) -W -Wall -Wimplicit -w \
     -funsigned-char -fno-strict-aliasing -DNO_GCC_BUILTINS -DFUNKEYS \
-    -I$(INC) -I$(EINC) -I$(SRC)/jmact -I$(JAUDIOLIBDIR)/include -I$(ENETDIR)/include -D_FORTIFY_SOURCE=2 \
+    -I$(INC) -I$(EINC) -I$(SRC)/jmact -I$(JAUDIOLIBDIR)/include -I$(ENETDIR)/include -I$(TIMIDITYLIBDIR) -D_FORTIFY_SOURCE=2 \
     $(F_JUMP_TABLES) $(ARCH)
 
 OURCXXFLAGS=-fno-exceptions -fno-rtti
@@ -227,7 +230,7 @@ endif
 ifeq ($(PRETTY_OUTPUT),1)
 .SILENT:
 endif
-.PHONY: clean all engine $(EOBJ)/$(ENGINELIB) $(EOBJ)/$(EDITORLIB) $(JAUDIOLIBDIR)/$(JAUDIOLIB) $(ENETDIR)/$(ENETLIB)
+.PHONY: clean all engine $(EOBJ)/$(ENGINELIB) $(EOBJ)/$(EDITORLIB) $(JAUDIOLIBDIR)/$(JAUDIOLIB) $(ENETDIR)/$(ENETLIB) $(TIMIDITYLIBDIR)/$(TIMIDITYLIB)
 
 # TARGETS
 
@@ -241,7 +244,7 @@ all:
 notice:
 	$(BUILD_STARTED)
 
-eduke32$(EXESUFFIX): $(GAMEOBJS) $(EOBJ)/$(ENGINELIB) $(JAUDIOLIBDIR)/$(JAUDIOLIB) $(ENETDIR)/$(ENETLIB)
+eduke32$(EXESUFFIX): $(GAMEOBJS) $(EOBJ)/$(ENGINELIB) $(JAUDIOLIBDIR)/$(JAUDIOLIB) $(ENETDIR)/$(ENETLIB) $(TIMIDITYLIBDIR)/$(TIMIDITYLIB)
 	$(LINK_STATUS)
 	if $(CC) -o $@ $^ $(LIBS) $(STDCPPLIB) $(MISCLINKOPTS); then $(LINK_OK); else $(LINK_FAILED); fi
 ifeq (1,$(RELEASE))
@@ -270,6 +273,7 @@ endif
 	$(MAKE) -C $(EROOT)/ "OBJ=../$(EOBJ)" \
 		SUPERBUILD=$(SUPERBUILD) POLYMOST=$(POLYMOST) DEBUGANYWAY=$(DEBUGANYWAY) KRANDDEBUG=$(KRANDDEBUG)\
 		USE_OPENGL=$(USE_OPENGL) BUILD32_ON_64=$(BUILD32_ON_64) PROFILER=$(PROFILER)\
+        PRETTY_OUTPUT=$(PRETTY_OUTPUT)\
 		NOASM=$(NOASM) RELEASE=$(RELEASE) OPTLEVEL=$(OPTLEVEL) $@
 ifeq ($(PRETTY_OUTPUT),1)
 	printf "\033[K\033[0;35mChanging dir to \033[1;35m$(CURDIR)\033[0;35m \033[0m\n"
@@ -295,6 +299,14 @@ ifeq ($(PRETTY_OUTPUT),1)
 	printf "\033[K\033[0;35mChanging dir to \033[1;35m$(CURDIR)\033[0;35m \033[0m\n"
 endif	
 
+$(TIMIDITYLIBDIR)/$(TIMIDITYLIB):
+ifeq ($(PRETTY_OUTPUT),1)	
+	printf "\033[K\033[0;35mChanging dir to \033[1;35m$(CURDIR)/$(TIMIDITYLIBDIR)\033[0;35m \033[0m\n"
+endif	
+	$(MAKE) -C $(TIMIDITYLIBDIR) PRETTY_OUTPUT=$(PRETTY_OUTPUT) EROOT=$(EROOT) RELEASE=$(RELEASE) OPTLEVEL=$(OPTLEVEL) DEBUGANYWAY=$(DEBUGANYWAY)
+ifeq ($(PRETTY_OUTPUT),1)		
+	printf "\033[K\033[0;35mChanging dir to \033[1;35m$(CURDIR)\033[0;35m \033[0m\n"
+endif	
 
 # RULES
 $(OBJ)/%.$o: $(SRC)/%.nasm
@@ -337,7 +349,7 @@ $(RSRC)/editor_banner.c: $(RSRC)/build.bmp
 # PHONIES	
 
 clean:
-	-rm -f $(OBJ)/* eduke32$(EXESUFFIX) mapster32$(EXESUFFIX) core* duke3d_w32$(EXESUFFIX) && $(MAKE) -C $(JAUDIOLIBDIR) clean && $(MAKE) -C $(ENETDIR) clean
+	-rm -f $(OBJ)/* eduke32$(EXESUFFIX) mapster32$(EXESUFFIX) core* duke3d_w32$(EXESUFFIX) && $(MAKE) -C $(JAUDIOLIBDIR) clean && $(MAKE) -C $(ENETDIR) clean && $(MAKE) -C $(TIMIDITYLIBDIR) clean
 
 veryclean: clean
 	-rm -f $(EOBJ)/* $(RSRC)/*banner*
