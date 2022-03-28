@@ -1658,8 +1658,8 @@ static void G_PrintFPS(void)
         {
             int32_t chars = Bsprintf(tempbuf, "%d ms (%3u fps)", howlong, LastCount);
 
-            printext256(windowx2-(chars<<(3-x))+1,windowy1+2,0,-1,tempbuf,x);
-            printext256(windowx2-(chars<<(3-x)),windowy1+1,
+            printext256(windowx2 - screencropoffset -(chars<<(3-x))+1,windowy1+2,0,-1,tempbuf,x);
+            printext256(windowx2 - screencropoffset -(chars<<(3-x)),windowy1+1,
                         (LastCount < LOW_FPS) ? COLOR_RED : COLOR_WHITE,-1,tempbuf,x);
 
             // lag meter

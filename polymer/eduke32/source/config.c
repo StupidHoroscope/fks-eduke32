@@ -627,6 +627,7 @@ extern int32_t r_maxfps;
 extern int32_t g_noSetup;
 extern int32_t demorec_diffs_cvar, demoplay_diffs;
 extern int32_t demorec_difftics_cvar, demorec_diffcompress_cvar, demorec_synccompress_cvar;
+extern int32_t enableFramerateLimiter;
 
 int32_t CONFIG_ReadSetup(void)
 {
@@ -720,6 +721,7 @@ int32_t CONFIG_ReadSetup(void)
         SCRIPT_GetNumber(ud.config.scripthandle, "Screen Setup", "ScreenMode",&ud.config.ScreenMode);
         SCRIPT_GetNumber(ud.config.scripthandle, "Screen Setup", "ScreenWidth",&ud.config.ScreenWidth);
 		SCRIPT_GetNumber(ud.config.scripthandle, "Screen Setup", "ScreenScaleMode", &ud.config.ScreenScaleMode);
+		SCRIPT_GetNumber(ud.config.scripthandle, "Screen Setup", "FramerateLimiter", &enableFramerateLimiter);
 
 #ifdef RENDERTYPEWIN
         {
@@ -895,7 +897,8 @@ void CONFIG_WriteSetup(void)
     SCRIPT_PutNumber(ud.config.scripthandle, "Screen Setup", "ScreenHeight",ud.config.ScreenHeight,FALSE,FALSE);    // JBF 20031206
     SCRIPT_PutNumber(ud.config.scripthandle, "Screen Setup", "ScreenMode",ud.config.ScreenMode,FALSE,FALSE);    // JBF 20031206
     SCRIPT_PutNumber(ud.config.scripthandle, "Screen Setup", "ScreenWidth",ud.config.ScreenWidth,FALSE,FALSE);  // JBF 20031206
-	SCRIPT_PutNumber(ud.config.scripthandle, "Screen Setup", "ScreenScaleMode", ud.config.ScreenScaleMode, FALSE, FALSE);    // JBF 20031206
+	SCRIPT_PutNumber(ud.config.scripthandle, "Screen Setup", "ScreenScaleMode", ud.config.ScreenScaleMode, FALSE, FALSE);
+	SCRIPT_PutNumber(ud.config.scripthandle, "Screen Setup", "FramerateLimiter", enableFramerateLimiter, FALSE, FALSE);
 
 #ifdef RENDERTYPEWIN
     SCRIPT_PutNumber(ud.config.scripthandle, "Screen Setup", "WindowPositioning", windowpos, FALSE, FALSE);

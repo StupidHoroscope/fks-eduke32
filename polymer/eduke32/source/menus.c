@@ -57,6 +57,7 @@ static int32_t soundbits, soundvoices, soundrate;
 static char *mousebuttonnames[] = { "Mouse1", "Mouse2", "Mouse3", "Mouse4", "Wheel Up", "Wheel Down", "Mouse5", "Mouse6", "Mouse7", "Mouse8"};
 
 extern int32_t voting;
+extern int32_t enableFramerateLimiter;
 
 extern enum ScreenScaleMode_t screenscalemode;
 void calculatescreenextents();
@@ -3098,17 +3099,17 @@ cheat_for_port_credits:
         c = (320>>1)-120;
 
 #if defined(POLYMOST) && defined(USE_OPENGL)
-        x = (4/*+(getrendermode() >= 3)*/);
+        x = (5/*+(getrendermode() >= 3)*/);
 #else
-        x = 4;
+        x = 5;
 #endif
-        onbar = (!getrendermode() && probey == 3); // (probey == 4);
-        if (probey == 0)
+        onbar = (!getrendermode() && probey == 4); // (probey == 4);
+        if (probey == 0 || probey == 1)
             x = M_Probe(c,50,16,x);
         else
             x = M_Probe(c,50+62-16-16-16,16,x);
 
-        if ((probey==0) && (KB_KeyPressed(sc_LeftArrow) || KB_KeyPressed(sc_RightArrow)))
+        if ((probey == 0 || probey == 1) && (KB_KeyPressed(sc_LeftArrow) || KB_KeyPressed(sc_RightArrow)))
         {
             S_PlaySound(PISTOL_BODYHIT);
             x=probey;
@@ -3157,6 +3158,19 @@ cheat_for_port_credits:
 
 				KB_ClearKeyDown(sc_LeftArrow);
 				KB_ClearKeyDown(sc_RightArrow);
+			}
+			break;
+
+		case 1:
+			{
+				if (KB_KeyPressed(sc_LeftArrow) || KB_KeyPressed(sc_RightArrow))
+				{
+					KB_ClearKeyDown(sc_LeftArrow);
+					KB_ClearKeyDown(sc_RightArrow);
+
+					enableFramerateLimiter = !enableFramerateLimiter;
+					S_PlaySound(KICK_HIT);
+				}
 			}
 			break;
 
@@ -3374,11 +3388,11 @@ cheat_for_port_credits:
             break;
 */
 
-        case 1:
+        case 2:
             ChangeToMenu(231);
             break;
 
-        case 2:
+        case 3:
             if (!getrendermode())
             {
                 ud.detail = 1-ud.detail;
@@ -3405,7 +3419,7 @@ cheat_for_port_credits:
                 gltexfiltermode = 0;
             gltexapplyprops();
             break;
-        case 3:
+        case 4:
             if (!getrendermode()) break;
             ChangeToMenu(230);
             break;
@@ -3418,6 +3432,11 @@ cheat_for_port_credits:
 			               screenscalemode == SCREENSCALE_STRETCHED ? "Stretched" :
 			               "INVALID";
 		mgametext(c+168, 50-8, sscaletext, MENUHIGHLIGHT(0), 2+8+16);
+
+		menutext(c, 50+16, MENUHIGHLIGHT(1), 0, "FPS LIMITER");
+		char* frameratetext = enableFramerateLimiter ? "ON" : "OFF";
+		mgametext(c + 168, 50 + 16 - 8, frameratetext, MENUHIGHLIGHT(1), 2 + 8 + 16);
+
 /*
         menutext(c,50,MENUHIGHLIGHT(0),0,"RESOLUTION");
         Bsprintf(tempbuf,"%d x %d",
@@ -3435,7 +3454,7 @@ cheat_for_port_credits:
         menutext(c+16,50+16+16+22,MENUHIGHLIGHT(3),changesmade==0,"APPLY CHANGES");
 */
 
-        menutext(c,50+62+16,MENUHIGHLIGHT(1),PHX(-6),"COLOR CORRECTION");
+        menutext(c,50+62+16,MENUHIGHLIGHT(2),PHX(-6),"COLOR CORRECTION");
         /*        {
                     short ss = ud.brightness;
                     bar(c+171,50+62+16,&ss,8,x==4,MENUHIGHLIGHT(4),PHX(-6));
@@ -3450,13 +3469,13 @@ cheat_for_port_credits:
         {
             int32_t i = (int32_t)(r_ambientlight*1024.f);
             int32_t j = i;
-            menutext(c,50+62+16+16,MENUHIGHLIGHT(2),0,"PIXEL DOUBLING");
-            menutext(c+168,50+62+16+16,MENUHIGHLIGHT(2),0,ud.detail?"OFF":"ON");
-            modval(0,1,(int32_t *)&ud.detail,1,probey==2);
-            menutext(c,50+62+16+16+16,MENUHIGHLIGHT(3),PHX(-6),"AMBIENT LIGHT");
-            _bar(0,c+185,50+62+16+16+16,&i,128,x==3,MENUHIGHLIGHT(3),g_netServer || numplayers>1,128,4096);
+            menutext(c,50+62+16+16,MENUHIGHLIGHT(3),0,"PIXEL DOUBLING");
+            menutext(c+168,50+62+16+16,MENUHIGHLIGHT(3),0,ud.detail?"OFF":"ON");
+            modval(0,1,(int32_t *)&ud.detail,1,probey==3);
+            menutext(c,50+62+16+16+16,MENUHIGHLIGHT(4),PHX(-6),"AMBIENT LIGHT");
+            _bar(0,c+185,50+62+16+16+16,&i,128,x==4,MENUHIGHLIGHT(4),g_netServer || numplayers>1,128,4096);
             Bsprintf(tempbuf,"%.2f",r_ambientlight);
-            mgametextpal(c+185+9,50+62+16+16+16+4, tempbuf, MENUHIGHLIGHT(3), 0);
+            mgametextpal(c+185+9,50+62+16+16+16+4, tempbuf, MENUHIGHLIGHT(4), 0);
 
             if (i != j)
             {

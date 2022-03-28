@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <signal.h>
+#include <sys/time.h>
 #include "sdl_inc.h"
 #include "compat.h"
 #include "sdlayer.h"
@@ -49,6 +50,8 @@ int32_t startwin_settitle(const char *s) { s=s; return 0; }
 // undefine to restrict windowed resolutions to conventional sizes
 #define ANY_WINDOWED_SIZE
 
+#define MAX_FPS 90
+
 // fix for mousewheel
 #define MWHEELTICKS 10
 static uint32_t mwheelup, mwheeldown;
@@ -79,6 +82,8 @@ extern int32_t curbrightness, gammabrightness;
 char nogl=0;
 #endif
 int32_t vsync=0;
+int32_t enableFramerateLimiter = 1;
+static suseconds_t lastUpdateTime = 0;
 
 #if (SDL_MAJOR_VERSION == 1 && SDL_MINOR_VERSION < 3)
 static char keytranslation[SDLK_LAST];
@@ -1458,6 +1463,37 @@ void showframe(int32_t w)
 	}
 
     SDL_Flip(sdl_surface);
+
+	struct timeval time;
+
+	if (enableFramerateLimiter)
+	{
+		// Cap the framerate, so we don't max out the CPU and waste battery
+		gettimeofday(&time, NULL);
+
+		suseconds_t newTime = time.tv_usec;
+
+		if (lastUpdateTime > 0)
+		{
+			suseconds_t delta = newTime - lastUpdateTime;
+
+			// gettimeofday wraps at 1,000,000, so if we have a negative delta that means we've wrapped
+			if (delta < 0)
+			{
+				delta = 1000000 + delta;
+			}
+
+			suseconds_t rollover = (1000000 / MAX_FPS) - delta;
+
+			if (rollover > 0)
+			{
+				usleep(rollover);
+			}
+		}
+	}
+
+	gettimeofday(&time, NULL);
+	lastUpdateTime = time.tv_usec;
 }
 
 
